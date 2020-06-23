@@ -15,6 +15,8 @@ namespace DeviceSever
     public:
         MQTTServer(muduo::net::EventLoop* loop, const muduo::net::InetAddress& listenAddr);
 
+        void start();
+
     private:
 
         void onConnection(const muduo::net::TcpConnectionPtr);
