@@ -14,15 +14,20 @@ DeviceSever::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::ne
     server_.setMessageCallback(std::bind(&MQTTServer::onMessage, this, _1, _2, _3));
 }
 
-void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr)
+void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
 {
-
+    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
+              << conn->localAddress().toIpPort() << " is "
+              << (conn->connected() ? "UP" : "DOWN");
+    conn->setTcpNoDelay(true);
 }
 
 void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
         muduo::Timestamp time)
 {
-
+    uint8_t data = buf->peekInt8();
+    std::cout<<data<<std::endl;
+    conn->send(buf);
 }
 
 void DeviceSever::MQTTServer::start()

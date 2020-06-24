@@ -8,6 +8,7 @@
 //c++
 #include <string>
 #include <functional>
+#include <iostream>
 
 //muduo
 #include <muduo/net/EventLoop.h>

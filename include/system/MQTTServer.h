@@ -19,7 +19,7 @@ namespace DeviceSever
 
     private:
 
-        void onConnection(const muduo::net::TcpConnectionPtr);
+        void onConnection(const muduo::net::TcpConnectionPtr& conn);
 
         void onMessage(const muduo::net::TcpConnectionPtr& conn,
                        muduo::net::Buffer* buf,
