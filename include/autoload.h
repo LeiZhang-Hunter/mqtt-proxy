@@ -22,6 +22,7 @@
 
 //business
 #include "MQTT.h"
+#include "MQTTResponse.h"
 #include "MQTTServer.h"
 
 #endif //DEVICE_SERVER_AUTOLOAD_H

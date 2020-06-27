@@ -6,7 +6,7 @@
 
 bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
 {
-    size_t read_byte = buf->readableBytes();
+    read_byte = buf->readableBytes();
     if(read_byte < 5)
     {
         return false;
@@ -15,18 +15,18 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
     //
     uint8_t fix_header = buf->peekInt8();
 
-    uint8_t retain = fix_header & 0x01;
+    retain = fix_header & 0x01;
 
-    uint8_t qos_level = fix_header & 0x06;
+    qos_level = fix_header & 0x06;
 
-    uint8_t dup_flag = fix_header & 0x08;
+    dup_flag = fix_header & 0x08;
 
-    uint8_t msg_type = (fix_header & 0xF0) >> 4;
+    msg_type = (fix_header & 0xF0) >> 4;
 
     //Remaining Length
     uint32_t multiplier = 1;
-    uint32_t remaining_length = 0;
-    uint32_t read_length = 0;
+    remaining_length = 0;
+    read_length = 0;
 
     char i=0;
     const char* byte = buf->peek();
@@ -57,52 +57,67 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
 
     buf->retrieve(i+1);
 
-    //variable header/可变的报头
-    uint16_t len = (buf->peekInt16());
+    switch (msg_type) {
+        case MQTT_CONNECT:
+            return parseOnConnect(buf);
+
+        case MQTT_SUBSCRIBE:
+            return parseOnSubscribe(buf);
+
+        default:
+            return false;
+    }
+}
+
+bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
+{
+//variable header/可变的报头
+    protocol_name_len = (buf->peekInt16());
     buf->retrieve(2);
     read_length += 2;
 
-    if(len < 4)
+    if(protocol_name_len < 4)
         return  false;
 
     //protocol name
-    std::string protocol_name(buf->peek(), len);
-    buf->retrieve(len);
-    read_length += len;
+    std::string protocol_name(buf->peek(), protocol_name_len);
+    buf->retrieve(protocol_name_len);
+    read_length += protocol_name_len;
 
-    uint8_t protocol_version = buf->peekInt8();
+    protocol_version = buf->peekInt8();
     buf->retrieve(1);
     read_length += 1;
 
-    uint8_t connect_flag = buf->peekInt8();
+    connect_flag = buf->peekInt8();
     buf->retrieve(1);
     read_length+=1;
 
     //connect flag
-    uint8_t will_reserved = connect_flag & 0x01;
-    uint8_t will_clean_session = (connect_flag & 0x02) >> 1;
-    uint8_t will_flag = connect_flag & 0x04 >> 2;
-    uint8_t will_qos = static_cast<uint8_t>((connect_flag & 0x18) >> 3);
-    uint8_t will_retain = ((connect_flag & 0x20) >> 5);
-    uint8_t password_flag = (connect_flag & 0x40) >> 6;
-    uint8_t username_flag = (connect_flag & 0x80) >> 7;
+    will_reserved = connect_flag & 0x01;
+    will_clean_session = (connect_flag & 0x02) >> 1;
+    will_flag = connect_flag & 0x04 >> 2;
+    will_qos = static_cast<uint8_t>((connect_flag & 0x18) >> 3);
+    will_retain = ((connect_flag & 0x20) >> 5);
+    password_flag = (connect_flag & 0x40) >> 6;
+    username_flag = (connect_flag & 0x80) >> 7;
 
     if(will_qos > 2 || will_qos < 0)
         return  false;
 
     //Keep Alive timer
-    uint16_t keep_live_time = buf->peekInt16();
+    keep_live_time = buf->peekInt16();
     buf->retrieve(2);
     read_length += 2;
 
-    uint16_t topic_name_len = buf->peekInt16();
+    topic_name_len = buf->peekInt16();
     buf->retrieve(2);
     read_length += 2;
 
     std::string topic_name(buf->peek(), topic_name_len);
+    buf->retrieve(topic_name_len);
     read_length+=topic_name_len;
 
-    uint32_t payload_len = remaining_length - read_length;
+    payload_len = remaining_length - read_length;
     if(payload_len < 0)
     {
         return  false;
@@ -112,5 +127,24 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
     {
         return true;
     }
+    return true;
+}
+
+bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
+{
+    message_id = buf->peekInt16();
+    buf->retrieve(2);
+
+    payload_len = buf->peekInt16();
+    if(payload_len > remaining_length - 2)
+    {
+        return false;
+    }
+    buf->retrieve(2);
+
+    std::string payload(buf->peek(), payload_len);
+    buf->retrieve(payload_len);
+    std::cout<<payload<<std::endl;
+    uint8_t temp_qos_level = buf->peekInt8();
     return true;
 }
