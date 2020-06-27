@@ -7,7 +7,7 @@
 
 enum{
     MQTT_CONNECT = 1,
-    MQTT_CONNECTACK = 2,
+    MQTT_CONNECTACK = 0x20,
     MQTT_PUBLISH = 3,
     MQTT_PUBACK = 4,
     MQTT_PUBREC = 5,
@@ -23,8 +23,10 @@ enum{
 };
 
 namespace DeviceSeverLib {
-    class MQTT {
-        MQTT(const std::string &recvBuffer);
+class MQTT :public muduo::noncopyable{
+    public:
+        MQTT() = default;
+        bool parse(muduo::net::Buffer *buf);
     private:
         std::string buffer;
     };

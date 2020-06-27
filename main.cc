@@ -5,6 +5,7 @@
 
 int main()
 {
+    printf("%ld\n",sizeof(int));
     //LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     muduo::net::EventLoop loop;
     muduo::net::InetAddress listenAddr(9500);

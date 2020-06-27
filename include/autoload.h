@@ -11,6 +11,7 @@
 #include <iostream>
 
 //muduo
+#include <muduo/base/noncopyable.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/TcpServer.h>
 #include <muduo/net/InetAddress.h>

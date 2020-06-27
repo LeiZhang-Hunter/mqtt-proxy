@@ -28,4 +28,4 @@ set(SOURCE_SRC
 add_executable(device-server ${SOURCE_SRC})
 
 #定义连接文件
-target_link_libraries(device-server  muduo_net muduo_base pthread)
+target_link_libraries(device-server  muduo_net muduo_base pthread device-server-lib)

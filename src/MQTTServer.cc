@@ -25,9 +25,22 @@ void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& c
 void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
         muduo::Timestamp time)
 {
-    uint8_t data = buf->peekInt8();
-    std::cout<<data<<std::endl;
-    conn->send(buf);
+    DeviceSeverLib::MQTT mqtt;
+    mqtt.parse(buf);
+
+
+
+
+//    switch (msg_type) {
+//        case MQTT_CONNECT:
+//            /**
+//             * 如果服务端收到一个CleanSession为0的连接，当前会话标志的值取决于服务端是否已经保存了ClientId对应客户端的会话状态。
+//             * 如果服务端已经保存了会话状态，它必须将CONNACK报文中的当前会话标志设置为1。
+//             * 如果服务端没有已保存的会话状态，它必须将CONNACK报文中的当前会话设置为0。还需要将CONNACK报文中的返回码设置为0 。
+//             */
+//            conn->send();
+//            break;
+//    }
 }
 
 void DeviceSever::MQTTServer::start()
