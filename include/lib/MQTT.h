@@ -23,14 +23,15 @@ enum{
 };
 
 namespace DeviceSeverLib {
-class MQTT :public muduo::noncopyable{
+class MQTT {
 public:
     MQTT() = default;
     bool parse(muduo::net::Buffer *buf);
 
-
+    //读取的字节数
     size_t read_byte = 0;
-    uint32_t read_length = 0;
+    //剩余的字节数
+    uint32_t last_read_length = 0;
 
     //fix header
     uint8_t retain = 0;

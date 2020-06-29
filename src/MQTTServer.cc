@@ -16,10 +16,11 @@ DeviceSever::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::ne
 
 void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
 {
-    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
-              << conn->localAddress().toIpPort() << " is "
-              << (conn->connected() ? "UP" : "DOWN");
+//    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
+//              << conn->localAddress().toIpPort() << " is "
+//              << (conn->connected() ? "UP" : "DOWN");
     conn->setTcpNoDelay(true);
+    conn->setCloseCallback(std::bind(&MQTTServer::onClose, this, _1));
 }
 
 void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
@@ -27,6 +28,7 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
 {
     DeviceSeverLib::MQTT mqtt;
     DeviceSeverLib::MQTTResponse response;
+    size_t read_sum = buf->readableBytes();
     bool res = mqtt.parse(buf);
     if(!res)
     {
@@ -46,7 +48,7 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
             break;
 
         case MQTT_SUBSCRIBE:
-            response.sendSubscribeAck();
+//            response.sendSubscribeAck();
             break;;
     }
 }
@@ -56,3 +58,7 @@ void DeviceSever::MQTTServer::start()
     server_.start();
 }
 
+void DeviceSever::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
+{
+    std::cout<<"end"<<std::endl;
+}

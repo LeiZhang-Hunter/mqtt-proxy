@@ -6,91 +6,101 @@
 
 bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
 {
+    //这个包可能并不完整我门首先要从不完整这个角度来分析，如果并不完整那么我们选择不解析
     read_byte = buf->readableBytes();
-    if(read_byte < 5)
-    {
-        return false;
-    }
 
-    //
-    uint8_t fix_header = buf->peekInt8();
-
-    retain = fix_header & 0x01;
-
-    qos_level = fix_header & 0x06;
-
-    dup_flag = fix_header & 0x08;
-
-    msg_type = (fix_header & 0xF0) >> 4;
-
-    //Remaining Length
-    uint32_t multiplier = 1;
-    remaining_length = 0;
-    read_length = 0;
-
-    char i=0;
-    const char* byte = buf->peek();
-    do {
-
-        byte++;
-        i++;
-
-        if(i > 4)
+    //可读的字节数
+    while(read_byte > 0){
+        if(read_byte < 2)
         {
             return false;
         }
 
-        remaining_length += (*byte & 127) * multiplier;
-        multiplier *= 128;
-    }while((*byte & 128) != 0);
+        //解析固定的报头
+        uint8_t fix_header = buf->peekInt8();
+        retain = fix_header & 0x01;
+        qos_level = fix_header & 0x06;
+        dup_flag = fix_header & 0x08;
+        msg_type = (fix_header & 0xF0) >> 4;
+        //解析剩余的长度
+        uint32_t multiplier = 1;
+        remaining_length = 0;
+        char i=0;
+        const char* byte = buf->peek();
+        do {
+            byte++;
+            i++;
+            if(i > 4)
+            {
+                return false;
+            }
+            remaining_length += (*byte & 127) * multiplier;
+            multiplier *= 128;
+        }while((*byte & 128) != 0);
 
-    if(remaining_length <= 0)
-    {
-        return  false;
-    }
+        if(remaining_length <= 0)
+        {
+            return  false;
+        }
 
-    //count readable bytes
-    if(read_byte < remaining_length +i +1)
-    {
-        return false;
-    }
-
-    buf->retrieve(i+1);
-
-    switch (msg_type) {
-        case MQTT_CONNECT:
-            return parseOnConnect(buf);
-
-        case MQTT_SUBSCRIBE:
-            return parseOnSubscribe(buf);
-
-        default:
+        //说明这是一个不完整的包,不要继续读了
+        if(read_byte < remaining_length +i +1)
+        {
             return false;
+        }
+
+        //检查剩余的可读的长度是否满足当前mqtt的剩余包长，如果满足则继续读出来如果不满足则等待下一个包
+        buf->retrieve(i+1);
+        read_byte -= i+1;
+
+        switch (msg_type) {
+            //如果说消息类型是连接消息，那么不需要考虑粘包问题因为下一步我们是需要发送ack的
+            case MQTT_CONNECT:
+                return parseOnConnect(buf);
+
+            case MQTT_SUBSCRIBE:
+                parseOnSubscribe(buf);
+                break;
+
+            default:
+                return false;
+        }
     }
+
+    return true;
 }
 
 bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
 {
-//variable header/可变的报头
+    //variable header/可变的报头
     protocol_name_len = (buf->peekInt16());
     buf->retrieve(2);
-    read_length += 2;
+    read_byte -= 2;
 
     if(protocol_name_len < 4)
         return  false;
 
+    if(protocol_name_len > read_byte)
+    {
+        return false;
+    }
+
     //protocol name
     std::string protocol_name(buf->peek(), protocol_name_len);
     buf->retrieve(protocol_name_len);
-    read_length += protocol_name_len;
+    read_byte -= protocol_name_len;
+    if(read_byte < 0)
+    {
+        return false;
+    }
 
     protocol_version = buf->peekInt8();
     buf->retrieve(1);
-    read_length += 1;
+    read_byte -= 1;
 
     connect_flag = buf->peekInt8();
     buf->retrieve(1);
-    read_length+=1;
+    read_byte-=1;
 
     //connect flag
     will_reserved = connect_flag & 0x01;
@@ -107,26 +117,21 @@ bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
     //Keep Alive timer
     keep_live_time = buf->peekInt16();
     buf->retrieve(2);
-    read_length += 2;
+    read_byte -= 2;
 
     topic_name_len = buf->peekInt16();
+    if(topic_name_len > read_byte)
+    {
+        return false;
+    }
     buf->retrieve(2);
-    read_length += 2;
+    read_byte -= 2;
 
     std::string topic_name(buf->peek(), topic_name_len);
     buf->retrieve(topic_name_len);
-    read_length+=topic_name_len;
+    read_byte-=topic_name_len;
 
-    payload_len = remaining_length - read_length;
-    if(payload_len < 0)
-    {
-        return  false;
-    }
-
-    if(payload_len == 0)
-    {
-        return true;
-    }
+    //这里要检查一下payload的长度是否合法
     return true;
 }
 
@@ -134,6 +139,7 @@ bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
     buf->retrieve(2);
+    read_byte -= 2;
 
     payload_len = buf->peekInt16();
     if(payload_len > remaining_length - 2)
@@ -141,10 +147,15 @@ bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
         return false;
     }
     buf->retrieve(2);
+    read_byte -= 2;
 
     std::string payload(buf->peek(), payload_len);
     buf->retrieve(payload_len);
+    read_byte -= payload_len;
     std::cout<<payload<<std::endl;
+
     uint8_t temp_qos_level = buf->peekInt8();
+    buf->retrieve(1);
+    read_byte -= 1;
     return true;
 }

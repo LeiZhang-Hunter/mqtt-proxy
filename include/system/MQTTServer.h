@@ -26,6 +26,8 @@ namespace DeviceSever
                        muduo::Timestamp time
                 );
 
+        void onClose(const muduo::net::TcpConnectionPtr& conn);
+
         muduo::net::EventLoop* loop_;
         muduo::net::TcpServer server_;
     };
