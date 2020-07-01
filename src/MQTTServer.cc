@@ -27,29 +27,10 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
         muduo::Timestamp time)
 {
     DeviceSeverLib::MQTT mqtt;
-    DeviceSeverLib::MQTTResponse response;
-    size_t read_sum = buf->readableBytes();
-    bool res = mqtt.parse(buf);
+    bool res = mqtt.parse(buf, conn);
     if(!res)
     {
         conn->forceClose();
-    }
-
-
-    uint8_t msg_type = mqtt.msg_type;
-    switch (msg_type) {
-        case MQTT_CONNECT:
-            /**
-             * 如果服务端收到一个CleanSession为0的连接，当前会话标志的值取决于服务端是否已经保存了ClientId对应客户端的会话状态。
-             * 如果服务端已经保存了会话状态，它必须将CONNACK报文中的当前会话标志设置为1。
-             * 如果服务端没有已保存的会话状态，它必须将CONNACK报文中的当前会话设置为0。还需要将CONNACK报文中的返回码设置为0 。
-             */
-            response.sendConnectAck(conn, 0, 0);
-            break;
-
-        case MQTT_SUBSCRIBE:
-//            response.sendSubscribeAck();
-            break;;
     }
 }
 

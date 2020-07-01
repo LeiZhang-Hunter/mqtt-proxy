@@ -4,7 +4,7 @@
 
 #include "autoload.h"
 
-bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
+bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
 {
     //这个包可能并不完整我门首先要从不完整这个角度来分析，如果并不完整那么我们选择不解析
     read_byte = buf->readableBytes();
@@ -53,13 +53,29 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf)
         buf->retrieve(i+1);
         read_byte -= i+1;
 
+        bool res;
+
+        MQTTResponse response;
+
         switch (msg_type) {
             //如果说消息类型是连接消息，那么不需要考虑粘包问题因为下一步我们是需要发送ack的
             case MQTT_CONNECT:
-                return parseOnConnect(buf);
+                res = parseOnConnect(buf);
+                if(res)
+                {
+                    response.sendConnectAck(conn, 0, 0);
+                }
+                break;
 
             case MQTT_SUBSCRIBE:
                 parseOnSubscribe(buf);
+                if(subscribe_qos_level == SUBSCRIBE_LEVEL_ONE)
+                {
+                    response.sendSubscribeAck(conn, message_id, payload, subscribe_qos_level);
+                }else if(subscribe_qos_level == SUBSCRIBE_LEVEL_TWO)
+                {
+
+                }
                 break;
 
             default:
@@ -149,12 +165,13 @@ bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
     buf->retrieve(2);
     read_byte -= 2;
 
-    std::string payload(buf->peek(), payload_len);
+    payload.append(buf->peek(), payload_len);
     buf->retrieve(payload_len);
     read_byte -= payload_len;
     std::cout<<payload<<std::endl;
 
     uint8_t temp_qos_level = buf->peekInt8();
+    subscribe_qos_level = (temp_qos_level & 0x03);
     buf->retrieve(1);
     read_byte -= 1;
     return true;
