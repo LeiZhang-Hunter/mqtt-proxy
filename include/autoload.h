@@ -21,8 +21,10 @@
 #include <muduo/base/Logging.h>
 
 //business
-#include "MQTT.h"
+#include "Util.h"
+#include "MQTTType.h"
 #include "MQTTResponse.h"
+#include "MQTT.h"
 #include "MQTTServer.h"
 
 #endif //DEVICE_SERVER_AUTOLOAD_H
