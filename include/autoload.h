@@ -25,6 +25,8 @@
 #include "MQTTType.h"
 #include "MQTTResponse.h"
 #include "MQTT.h"
+#include "MQTTConnPool.h"
+#include "MQTTContainerGlobal.h"
 #include "MQTTServer.h"
 
 #endif //DEVICE_SERVER_AUTOLOAD_H

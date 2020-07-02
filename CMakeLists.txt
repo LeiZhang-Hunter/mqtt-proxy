@@ -23,6 +23,7 @@ set(SOURCE_SRC
     main.cc
     include/autoload.h
     src/MQTTServer.cc
+    src/MQTTConnPool.cc
     )
 
 add_executable(device-server ${SOURCE_SRC})
