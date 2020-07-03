@@ -4,6 +4,7 @@
 
 #include "autoload.h"
 
+//循环解析mqtt报文
 bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
 {
     //这个包可能并不完整我门首先要从不完整这个角度来分析，如果并不完整那么我们选择不解析
@@ -71,7 +72,7 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
                 parseOnSubscribe(buf);
                 if(subscribe_qos_level == SUBSCRIBE_LEVEL_ONE)
                 {
-                    response.sendSubscribeAck(conn, message_id, payload, subscribe_qos_level);
+                    response.sendSubscribeAck(conn, message_id, subscribe_qos_level);
                 }else if(subscribe_qos_level == SUBSCRIBE_LEVEL_TWO)
                 {
 
@@ -86,6 +87,7 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
     return true;
 }
 
+//解析mqtt连接协议
 bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
 {
     //variable header/可变的报头
@@ -151,11 +153,16 @@ bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
     return true;
 }
 
+//解析订阅协议
 bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
     buf->retrieve(2);
     read_byte -= 2;
+    if(!payload.empty())
+    {
+        payload.clear();
+    }
 
     payload_len = buf->peekInt16();
     if(payload_len > remaining_length - 2)
@@ -174,5 +181,6 @@ bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
     subscribe_qos_level = (temp_qos_level & 0x03);
     buf->retrieve(1);
     read_byte -= 1;
+    subscribe_map[payload] = subscribe_qos_level;
     return true;
 }

@@ -16,8 +16,7 @@ public:
         conn->send(message, sizeof(message));
         return true;
     }
-    bool sendSubscribeAck(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id, const std::string& topic_name,
-     uint8_t subscribe_qos_level);
+    bool sendSubscribeAck(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id, uint8_t subscribe_qos_level);
     ~MQTTResponse() = default;
 };
 }

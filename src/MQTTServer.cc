@@ -21,24 +21,19 @@ void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& c
 //              << (conn->connected() ? "UP" : "DOWN");
     conn->setTcpNoDelay(true);
     conn->setCloseCallback(std::bind(&MQTTServer::onClose, this, _1));
+    std::shared_ptr<DeviceSeverLib::MQTT> mqtt_package = std::make_shared<DeviceSeverLib::MQTT>();
+    //绑定一个mqtt处理器
+    MQTTContainer.pool->registerConn(conn, mqtt_package);
 }
 
 void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
         muduo::Timestamp time)
 {
-    std::shared_ptr<DeviceSeverLib::MQTT> mqtt_package = std::make_shared<DeviceSeverLib::MQTT>();
-    bool res = mqtt_package->parse(buf, conn);
+    std::shared_ptr<DeviceSeverLib::MQTT> mqttHandle = MQTTContainer.pool->getConnMQTTInfo(conn);
+    bool res = mqttHandle->parse(buf, conn);
     if(!res)
     {
         conn->forceClose();
-    }
-
-    switch (mqtt_package->getMsgType())
-    {
-        case MQTT_CONNECT:
-            //对包进行绑定
-            MQTTContainer.pool->registerConn(conn, mqtt_package);
-            break;
     }
 }
 

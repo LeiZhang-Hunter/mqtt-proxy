@@ -22,11 +22,6 @@ public:
         return message_id;
     }
 
-    std::string& getPayload()
-    {
-        return payload;
-    }
-
     ~MQTT() = default;
 
 private:
@@ -57,6 +52,8 @@ private:
     uint32_t remaining_length = 0;
     uint8_t subscribe_qos_level = 0;
     std::string payload;
+    //存储订阅的map
+    std::map<std::string, uint8_t> subscribe_map;
 
     //这里用来存储tcp的连接用来发送反馈的
     bool parseOnConnect(muduo::net::Buffer *buf);

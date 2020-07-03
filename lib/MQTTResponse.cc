@@ -4,11 +4,12 @@
 #include "autoload.h"
 
 bool DeviceSeverLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnectionPtr &conn,
-        uint16_t message_id, const std::string& topic_name, uint8_t subscribe_qos_level)
+        uint16_t message_id, uint8_t subscribe_qos_level)
 {
     std::vector<uint8_t> buffer;
     Util util;
-    uint32_t remainingLength = topic_name.length() + 2 + 2;
+    //两个字节的固定包头 + 上一个字节的载荷长度
+    uint32_t remainingLength = 1 + 2;
 
     //拼接固定报头
     buffer.push_back(MQTT_SUBACK);
@@ -20,14 +21,6 @@ bool DeviceSeverLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnect
     buffer.push_back(MSB(message_id));
     buffer.push_back(LSB(message_id));
     //载荷循环放进去
-    char* payload_str = (char*)topic_name.c_str();
-    size_t payload_length = topic_name.length();
-    size_t i;
-    for(i = 0;i < payload_length; i++)
-    {
-        buffer.push_back(*payload_str);
-        payload_str++;
-    }
     //服务级别
     buffer.push_back(subscribe_qos_level);
 

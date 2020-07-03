@@ -27,5 +27,5 @@ enum{
 #endif //DEVICE_SERVER_MQTTTYPE_H
 
 //获取字节高位
-#define MSB(message_id) ((message_id & 0xFF00) >> 8)
-#define LSB(message_id) (message_id & 0x00FF)
+#define MSB(message_id) static_cast<uint8_t>((message_id & 0xFF00) >> 8)
+#define LSB(message_id) static_cast<uint8_t>(message_id & 0x00FF)
