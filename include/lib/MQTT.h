@@ -22,6 +22,11 @@ public:
         return message_id;
     }
 
+    int getErrno()
+    {
+        return parse_mqtt_errno;
+    }
+
     ~MQTT() = default;
 
 private:
@@ -51,13 +56,16 @@ private:
     uint32_t payload_len = 0;
     uint32_t remaining_length = 0;
     uint8_t subscribe_qos_level = 0;
+    std::string topic_name;
     std::string payload;
     //存储订阅的map
     std::map<std::string, uint8_t> subscribe_map;
+    int parse_mqtt_errno = 0;
 
     //这里用来存储tcp的连接用来发送反馈的
     bool parseOnConnect(muduo::net::Buffer *buf);
     bool parseOnSubscribe(muduo::net::Buffer *buf);
+    bool parseOnPublish(muduo::net::Buffer *buf);
 
 };
 }

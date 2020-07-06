@@ -21,11 +21,14 @@ enum{
     MQTT_DISCONNECT = 14
 };
 
-#define SUBSCRIBE_LEVEL_ZERO 0
-#define SUBSCRIBE_LEVEL_ONE 1
-#define SUBSCRIBE_LEVEL_TWO 2
-#endif //DEVICE_SERVER_MQTTTYPE_H
+#define QUALITY_LEVEL_ZERO 0
+#define QUALITY_LEVEL_ONE 1
+#define QUALITY_LEVEL_TWO 2
 
 //获取字节高位
 #define MSB(message_id) static_cast<uint8_t>((message_id & 0xFF00) >> 8)
 #define LSB(message_id) static_cast<uint8_t>(message_id & 0x00FF)
+
+#define UINT8_LEN 1
+#define UINT16_LEN 2
+#endif //DEVICE_SERVER_MQTTTYPE_H
