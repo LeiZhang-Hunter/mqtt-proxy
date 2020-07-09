@@ -21,6 +21,7 @@ public:
     bool sendPublishRec(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
     bool sendPublishRel(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
     bool sendPublishComp(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
+    bool sendPingResp(const muduo::net::TcpConnectionPtr &conn);
     ~MQTTResponse() = default;
 };
 }

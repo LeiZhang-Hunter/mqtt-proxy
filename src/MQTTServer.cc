@@ -33,7 +33,8 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
     bool res = mqttHandle->parse(buf, conn);
     if(!res)
     {
-        conn->forceClose();
+        std::cout<<"close"<<std::endl;
+//        conn->forceClose();
     }
 }
 

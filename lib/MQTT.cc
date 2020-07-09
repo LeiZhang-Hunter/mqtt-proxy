@@ -60,7 +60,7 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
 
         switch (msg_type) {
             //如果说消息类型是连接消息，那么不需要考虑粘包问题因为下一步我们是需要发送ack的
-            case MQTT_CONNECT:
+            case MQTT_CONNECT_TYPE:
                 res = parseOnConnect(buf);
                 if(res)
                 {
@@ -68,14 +68,14 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
                 }
                 break;
 
-            case MQTT_SUBSCRIBE:
+            case MQTT_SUBSCRIBE_TYPE:
                 if(parseOnSubscribe(buf))
                 {
                     response.sendSubscribeAck(conn, message_id, subscribe_qos_level);
                 }
                 break;
 
-            case MQTT_PUBLISH:
+            case MQTT_PUBLISH_TYPE:
                 parseOnPublish(buf);
                 if(qos_level == QUALITY_LEVEL_ONE)
                 {
@@ -86,8 +86,17 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
                 }
                 break;
 
-            case MQTT_PUBREL:
+            case MQTT_PUBREL_TYPE:
                 //解析出message_id 然后做出回应
+                parseMessageId(buf);
+                response.sendPublishComp(conn, message_id);
+                break;
+
+            case MQTT_DISCONNECT_TYPE:
+                break;
+
+            case MQTT_PINGREQ_TYPE:
+                response.sendPingResp(conn);
                 break;
 
             default:
@@ -209,15 +218,18 @@ bool DeviceSeverLib::MQTT::parseOnPublish(muduo::net::Buffer *buf)
         payload.clear();
     }
 
-    //主题
+    //主题长度
     uint16_t topic_len = buf->peekInt16();
     if(topic_len + UINT16_LEN > remaining_length)
     {
         return false;
     }
     buf->retrieve(UINT16_LEN);
+    read_byte -= UINT16_LEN;
+
     topic_name.append(buf->peek(), topic_len);
     buf->retrieve(topic_len);
+    read_byte -= topic_len;
 
     //剩余长度 - topic标题长度所占的高低字节 - 主题长度
     payload_len = remaining_length - UINT16_LEN - topic_len;
@@ -227,11 +239,19 @@ bool DeviceSeverLib::MQTT::parseOnPublish(muduo::net::Buffer *buf)
         message_id = buf->peekInt16();
         buf->retrieve(UINT16_LEN);
         payload_len -= UINT16_LEN;
+        read_byte -= UINT16_LEN;
     }
 
-
-
-    //翻译被日本风
-    payload.assign(buf->peek(), payload_len);
+    //payload解析
+    payload.append(buf->peek(), payload_len);
+    buf->retrieve(payload_len);
+    read_byte -= payload_len;
     return true;
+}
+
+//解析出message_id
+uint16_t DeviceSeverLib::MQTT::parseMessageId(muduo::net::Buffer *buf)
+{
+    message_id = buf->peekInt16();
+    read_byte -= UINT16_LEN;
 }

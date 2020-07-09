@@ -66,6 +66,7 @@ private:
     bool parseOnConnect(muduo::net::Buffer *buf);
     bool parseOnSubscribe(muduo::net::Buffer *buf);
     bool parseOnPublish(muduo::net::Buffer *buf);
+    uint16_t parseMessageId(muduo::net::Buffer *buf);
 
 };
 }

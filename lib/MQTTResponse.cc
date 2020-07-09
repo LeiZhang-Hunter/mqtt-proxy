@@ -83,3 +83,11 @@ bool DeviceSeverLib::MQTTResponse::sendPublishComp(const muduo::net::TcpConnecti
     conn->send(publish_ack_buffer.data(), publish_ack_buffer.size());
     return true;
 }
+
+//解析消息id
+bool DeviceSeverLib::MQTTResponse::sendPingResp(const muduo::net::TcpConnectionPtr &conn)
+{
+    uint8_t message[2] = {MQTT_PINGRESP, 0};
+    conn->send(message, 2);
+    return true;
+}
