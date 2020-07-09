@@ -77,6 +77,17 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
 
             case MQTT_PUBLISH:
                 parseOnPublish(buf);
+                if(qos_level == QUALITY_LEVEL_ONE)
+                {
+                    response.sendPublishAck(conn, message_id);
+                }else if(qos_level == QUALITY_LEVEL_TWO)
+                {
+                    response.sendPublishRec(conn, message_id);
+                }
+                break;
+
+            case MQTT_PUBREL:
+                //解析出message_id 然后做出回应
                 break;
 
             default:

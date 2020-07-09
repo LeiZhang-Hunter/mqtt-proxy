@@ -17,6 +17,10 @@ public:
         return true;
     }
     bool sendSubscribeAck(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id, uint8_t subscribe_qos_level);
+    bool sendPublishAck(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
+    bool sendPublishRec(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
+    bool sendPublishRel(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
+    bool sendPublishComp(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id);
     ~MQTTResponse() = default;
 };
 }

@@ -20,6 +20,7 @@ public:
     }
 
     muduo::MutexLock mutex;
+    DeviceSeverLib::Util util;
     std::shared_ptr<DeviceSever::MQTTConnPool> pool GUARDED_BY(mutex);
 
     ~_MQTTContainerGlobal() = default;
