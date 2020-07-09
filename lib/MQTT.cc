@@ -39,7 +39,7 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
             multiplier *= 128;
         }while((*byte & 128) != 0);
 
-        if(remaining_length <= 0)
+        if(remaining_length < 0)
         {
             return  false;
         }
@@ -57,6 +57,7 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
         bool res;
 
         MQTTResponse response;
+        std::cout<<(int)msg_type<<std::endl;
 
         switch (msg_type) {
             //如果说消息类型是连接消息，那么不需要考虑粘包问题因为下一步我们是需要发送ack的
@@ -253,5 +254,6 @@ bool DeviceSeverLib::MQTT::parseOnPublish(muduo::net::Buffer *buf)
 uint16_t DeviceSeverLib::MQTT::parseMessageId(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
+    buf->retrieve(UINT16_LEN);
     read_byte -= UINT16_LEN;
 }
