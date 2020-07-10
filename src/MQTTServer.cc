@@ -31,6 +31,10 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
 {
     std::shared_ptr<DeviceSeverLib::MQTT> mqttHandle = MQTTContainer.pool->getConnMQTTInfo(conn);
     bool res = mqttHandle->parse(buf, conn);
+    if(!res)
+    {
+        std::cout<<"error"<<std::endl;
+    }
 }
 
 void DeviceSever::MQTTServer::start()
