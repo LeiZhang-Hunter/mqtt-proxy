@@ -5,6 +5,9 @@
 #ifndef DEVICE_SERVER_AUTOLOAD_H
 #define DEVICE_SERVER_AUTOLOAD_H
 
+//c
+#include <fcntl.h>
+
 //c++
 #include <string>
 #include <functional>

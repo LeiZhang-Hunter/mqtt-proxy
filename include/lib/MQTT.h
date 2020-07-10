@@ -27,12 +27,24 @@ public:
         return parse_mqtt_errno;
     }
 
+    bool bufferRollback(muduo::net::Buffer *buf)
+    {
+        std::cout<<"back:"<<transaction_read_byte<<std::endl;
+        buf->retrieve(-transaction_read_byte);
+        return true;
+    }
+
     ~MQTT() = default;
 
 private:
-    //读取的字节数
-    size_t read_byte = 0;
+    //目标要读取字节数
+    size_t dest_read_byte = 0;
+    //当前已经读取的字节数
+    size_t now_read_byte = 0;
     //剩余的字节数
+    size_t last_read_byte = 0;
+    //事务读取的字节数，如果出现解析失败方便回滚到正要的位置，让制读取失败之后下次拼接包的时候出现的问题
+    size_t transaction_read_byte = 0;
 
     //fix header
     uint8_t retain = 0;
