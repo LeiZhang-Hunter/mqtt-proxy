@@ -145,7 +145,7 @@ bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
     }
 
     //protocol name
-    std::string protocol_name(buf->peek(), protocol_name_len);
+    protocol_name.assign(buf->peek(), protocol_name_len);
     buf->retrieve(protocol_name_len);
     last_read_byte -= protocol_name_len;
     transaction_read_byte += protocol_name_len;
@@ -191,7 +191,7 @@ bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
     last_read_byte -= UINT16_LEN;
     transaction_read_byte += UINT16_LEN;
 
-    std::string topic_name(buf->peek(), topic_name_len);
+    client_id.assign(buf->peek(), topic_name_len);
     buf->retrieve(topic_name_len);
     last_read_byte-=topic_name_len;
     transaction_read_byte += topic_name_len;

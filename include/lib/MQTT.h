@@ -34,6 +34,12 @@ public:
         return true;
     }
 
+    std::string& getClientId()
+    {
+        return client_id;
+    }
+
+
     ~MQTT() = default;
 
 private:
@@ -74,12 +80,14 @@ private:
     std::map<std::string, uint8_t> subscribe_map;
     int parse_mqtt_errno = 0;
 
+    std::string protocol_name;
+    std::string client_id;
+
     //这里用来存储tcp的连接用来发送反馈的
     bool parseOnConnect(muduo::net::Buffer *buf);
     bool parseOnSubscribe(muduo::net::Buffer *buf);
     bool parseOnPublish(muduo::net::Buffer *buf);
     uint16_t parseMessageId(muduo::net::Buffer *buf);
-
 };
 }
 #endif //DEVICE_SERVER_MQTT_H

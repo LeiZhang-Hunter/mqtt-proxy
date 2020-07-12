@@ -34,6 +34,14 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
     if(!res)
     {
         std::cout<<"error"<<std::endl;
+        conn->forceClose();
+    }else{
+        if(mqttHandle->getMsgType() == MQTT_CONNECT_TYPE)
+        {
+            MQTTContainer.sessionPool->bindSession(mqttHandle->getClientId());
+        }else{
+            conn->forceClose();
+        }
     }
 }
 
