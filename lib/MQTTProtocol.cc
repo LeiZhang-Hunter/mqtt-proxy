@@ -5,7 +5,7 @@
 #include "autoload.h"
 
 //循环解析mqtt报文
-bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
+bool DeviceSeverLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
 {
     //这个包可能并不完整我门首先要从不完整这个角度来分析，如果并不完整那么我们选择不解析
     dest_read_byte = buf->readableBytes();
@@ -128,7 +128,7 @@ bool DeviceSeverLib::MQTT::parse(muduo::net::Buffer *buf, const muduo::net::TcpC
 }
 
 //解析mqtt连接协议
-bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
+bool DeviceSeverLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
 {
     //variable header/可变的报头
     protocol_name_len = (buf->peekInt16());
@@ -200,7 +200,7 @@ bool DeviceSeverLib::MQTT::parseOnConnect(muduo::net::Buffer *buf)
 }
 
 //解析订阅协议
-bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
+bool DeviceSeverLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);
@@ -236,7 +236,7 @@ bool DeviceSeverLib::MQTT::parseOnSubscribe(muduo::net::Buffer *buf)
 }
 
 //解析发布
-bool DeviceSeverLib::MQTT::parseOnPublish(muduo::net::Buffer *buf)
+bool DeviceSeverLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
 {
     if(!topic_name.empty())
     {
@@ -284,7 +284,7 @@ bool DeviceSeverLib::MQTT::parseOnPublish(muduo::net::Buffer *buf)
 }
 
 //解析出message_id
-uint16_t DeviceSeverLib::MQTT::parseMessageId(muduo::net::Buffer *buf)
+uint16_t DeviceSeverLib::MQTTProtocol::parseMessageId(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);

@@ -14,6 +14,7 @@
 #include <iostream>
 
 //muduo
+#include <muduo/base/Singleton.h>
 #include <muduo/base/noncopyable.h>
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/TcpServer.h>
@@ -27,12 +28,13 @@
 #include "Util.h"
 #include "MQTTType.h"
 #include "MQTTResponse.h"
-#include "MQTT.h"
+#include "MQTTProtocol.h"
 #include "MQTTClientSession.h"
 #include "MQTTClientSessionPool.h"
 #include "MQTTTopicTree.h"
 #include "MQTTConnPool.h"
 #include "MQTTContainerGlobal.h"
+#include "MQTTSessionHandle.h"
 #include "MQTTServer.h"
 
 #endif //DEVICE_SERVER_AUTOLOAD_H

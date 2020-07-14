@@ -5,14 +5,15 @@
 #ifndef DEVICE_SERVER_MQTTCLIENTSESSIONPOOL_H
 #define DEVICE_SERVER_MQTTCLIENTSESSIONPOOL_H
 
-namespace DeviceSever
+namespace DeviceServer
 {
+
 class MQTTClientSessionPool : public muduo::noncopyable
 {
 public:
     MQTTClientSessionPool();
 
-    typedef std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>> sessionMapType;
+    typedef std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>> ClientIdMapType;
 
     std::shared_ptr<DeviceServer::MQTTClientSession> bindSession(const std::string& client_id,
             const muduo::net::TcpConnectionPtr& conn);
@@ -20,9 +21,8 @@ public:
     ~MQTTClientSessionPool();
 private:
 
-    muduo::MutexLock lock;
-    sessionMapType clientMap;
-
+    muduo::MutexLock Lock_;
+    ClientIdMapType ClientIdMap;
     //std::map<>
 
 };

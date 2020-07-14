@@ -21,27 +21,44 @@ void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& c
 //              << (conn->connected() ? "UP" : "DOWN");
     conn->setTcpNoDelay(true);
     conn->setCloseCallback(std::bind(&MQTTServer::onClose, this, _1));
-    std::shared_ptr<DeviceSeverLib::MQTT> mqtt_package = std::make_shared<DeviceSeverLib::MQTT>();
     //绑定一个mqtt处理器
-    MQTTContainer.pool->registerConn(conn, mqtt_package);
 }
 
 void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
         muduo::Timestamp time)
 {
-    std::shared_ptr<DeviceSeverLib::MQTT> mqttHandle = MQTTContainer.pool->getConnMQTTInfo(conn);
-    bool res = mqttHandle->parse(buf, conn);
-    if(!res)
+    std::shared_ptr<DeviceServer::MQTTClientSession> session;
+    DeviceSeverLib::MQTTProtocol protocol = muduo::Singleton<DeviceSeverLib::MQTTProtocol>::instance();
+    if(protocol.parse(buf, conn))
     {
-        std::cout<<"error"<<std::endl;
-        conn->forceClose();
-    }else{
-        if(mqttHandle->getMsgType() == MQTT_CONNECT_TYPE)
+        if(protocol.getMsgType() == MQTT_CONNECT_TYPE)
         {
-            MQTTContainer.sessionPool->bindSession(mqttHandle->getClientId());
-        }else{
+            //绑定进入回话
+            if(!(session = MQTTContainer.sessionPool->bindSession(protocol.getClientId(), conn)))
+            {
+                conn->forceClose();
+            }else{
+                //绑定会话信息
+                session->setRetain(protocol.getRetain());
+                session->setDupFlag(protocol.getDupFlag());
+                session->setQosLevel(protocol.getQosLevel());
+                session->setCleanSession(protocol.will_clean_session);
+                session->setWillFlag(protocol.will_flag);
+                session->setWillQos(protocol.will_qos);
+                session->setWillRetain(protocol.will_retain);
+                session->setUserNameFlag(protocol.username_flag);
+                session->setPasswordFlag(protocol.password_flag);
+                session->setKeepAliveTime(protocol.keep_live_time);
+                session->setProtoName(protocol.getProtocolName());
+                session->setSessionMessageCallBack();
+                session->setSessionCloseCallBack();
+            }
+        } else {
             conn->forceClose();
         }
+    } else {
+        //强制关闭
+        conn->forceClose();
     }
 }
 
@@ -52,6 +69,5 @@ void DeviceSever::MQTTServer::start()
 
 void DeviceSever::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
 {
-    MQTTContainer.pool->deleteConn(conn);
     std::cout<<"end"<<std::endl;
 }

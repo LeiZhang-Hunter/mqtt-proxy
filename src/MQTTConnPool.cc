@@ -11,7 +11,7 @@ DeviceSever::MQTTConnPool::MQTTConnPool()
 }
 
 bool DeviceSever::MQTTConnPool::registerConn(const muduo::net::TcpConnectionPtr& conn,
-        std::shared_ptr<DeviceSeverLib::MQTT>& data)
+        std::shared_ptr<DeviceSeverLib::MQTTProtocol>& data)
 {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnectPool[conn] = data;

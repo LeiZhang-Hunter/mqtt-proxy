@@ -2,13 +2,16 @@
 // Created by zhanglei on 2020/6/23.
 //
 
-#ifndef DEVICE_SERVER_MQTT_H
-#define DEVICE_SERVER_MQTT_H
+#ifndef DEVICE_SERVER_MQTTPROTOCOL_H
+#define DEVICE_SERVER_MQTTPROTOCOL_H
 
 namespace DeviceSeverLib {
-class MQTT {
+/**
+ * 这个类主要是负责mqtt协议内容解析的
+ */
+class MQTTProtocol {
 public:
-    MQTT() = default;
+    MQTTProtocol() = default;
 
     bool parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn);
 
@@ -39,10 +42,29 @@ public:
         return client_id;
     }
 
+    std::string& getProtocolName()
+    {
+        return protocol_name;
+    }
 
-    ~MQTT() = default;
+    uint8_t getRetain()
+    {
+        return retain;
+    }
 
-private:
+    uint16_t getQosLevel()
+    {
+        return qos_level;
+    };
+
+    uint8_t getDupFlag()
+    {
+        return dup_flag;
+    }
+
+
+    ~MQTTProtocol() = default;
+
     //目标要读取字节数
     size_t dest_read_byte = 0;
     //当前已经读取的字节数
@@ -90,4 +112,4 @@ private:
     uint16_t parseMessageId(muduo::net::Buffer *buf);
 };
 }
-#endif //DEVICE_SERVER_MQTT_H
+#endif //DEVICE_SERVER_MQTTPROTOCOL_H
