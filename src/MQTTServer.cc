@@ -38,7 +38,7 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
             {
                 conn->forceClose();
             }else{
-                std::shared_ptr<DeviceServer::MQTTSessionHandle> handle;
+                std::shared_ptr<DeviceServer::MQTTSessionHandle> handle(new DeviceServer::MQTTSessionHandle);
                 //绑定会话信息
                 session->setRetain(protocol.getRetain());
                 session->setDupFlag(protocol.getDupFlag());
@@ -51,10 +51,13 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 session->setPasswordFlag(protocol.password_flag);
                 session->setKeepAliveTime(protocol.keep_live_time);
                 session->setProtoName(protocol.getProtocolName());
-                session->setSessionConnectCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onClose, handle, _1));
-                session->setSessionMessageCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onMessage, handle,
-                        _1, _2, _3));
-                session->setSessionCloseCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onClose, handle, _1));
+                //设置mqtt的主要事件
+                //触发设备上线事件
+                handle->OnConnect(session);
+                session->setSubscribeCallback(std::bind(&MQTTSessionHandle::OnSubscribe, handle, _1, _2, _3));
+                session->setUnSubscribeCallback(std::bind(&MQTTSessionHandle::OnUnSubscribe, handle, _1, _2, _3));
+                session->setPublishCallback(std::bind(&MQTTSessionHandle::OnPublish, handle, _1, _2, _3, _4));
+                session->setDisConnectCallback(std::bind(&MQTTSessionHandle::OnDisConnect, handle, _1));
                 //会话启动失败了直接强制关闭吧
                 bool res = session->startSession();
                 if(!res)

@@ -2,18 +2,36 @@
 // Created by zhanglei on 2020/7/14.
 //
 #include "autoload.h"
-
-void DeviceServer::MQTTSessionHandle::onConnect(const DeviceServer::Callback::MQTTClientSessionPtr& session)
+//连接建立
+bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session)
 {
     std::cout<<"connect"<<std::endl;
 }
 
-void DeviceServer::MQTTSessionHandle::onMessage(const DeviceServer::Callback::MQTTClientSessionPtr& session, muduo::net::Buffer *buf,muduo::Timestamp time)
+//订阅事件
+bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
+        const std::string& topic, muduo::Timestamp timestamp)
 {
-    std::cout<<"message"<<std::endl;
+
 }
 
-void DeviceServer::MQTTSessionHandle::onClose(const DeviceServer::Callback::MQTTClientSessionPtr& session)
+//取消订阅事件
+bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
+        const std::string& topic, muduo::Timestamp timestamp)
 {
-    std::cout<<"close"<<std::endl;
+
+}
+
+//收到相关主题的推送
+void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
+        const std::string& topic, const std::string& message, muduo::Timestamp timestamp
+)
+{
+
+}
+
+//关闭会话触发的事件
+bool DeviceServer::MQTTSessionHandle::OnDisConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session)
+{
+
 }

@@ -13,6 +13,8 @@ bool DeviceServer::MQTTClientSession::startSession()
         Conn->setMessageCallback(std::bind(&MQTTClientSession::SessionOnMessage, shared_from_this(), _1, _2, _3));
         //设置关闭的回调事件
         Conn->setCloseCallback(std::bind(&MQTTClientSession::SessionOnClose, shared_from_this(), _1));
+        //标记为上线
+        IsOnline = Online;
         return true;
     }else{
         LOG_WARN << getClientId()<< "Conn has been destroy";
@@ -21,11 +23,13 @@ bool DeviceServer::MQTTClientSession::startSession()
 }
 
 //收到消息的时候触发
-void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *,
+void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer* buf,
         muduo::Timestamp)
 {
     auto protocol = muduo::Singleton<DeviceServerLib::MQTTProtocol>::instance();
-
+    if(protocol.parse(buf, conn))
+    {
+    }
 }
 
 //关闭连接的时候触发

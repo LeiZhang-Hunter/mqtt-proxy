@@ -7,12 +7,15 @@
 
 namespace DeviceServer
 {
+#define Online 1
+#define Offline 0
 
 class MQTTClientSession : public std::enable_shared_from_this<MQTTClientSession>
 {
 public:
 
     MQTTClientSession()
+    :Lock_(), RefCount(0), IsOnline(0)
     {
 
     }
@@ -153,21 +156,38 @@ public:
         return ProtocolVersion = version;
     }
 
-    bool setSessionConnectCallBack(const DeviceServer::Callback::SessionConnectCallback& closure)
+    //设置连接的回调
+    bool setConnectCallback(const DeviceServer::Callback::SessionConnectCallback& cb)
     {
-        OnConnect = closure;
+        OnConnect = cb;
         return true;
     }
 
-    bool setSessionMessageCallBack(const DeviceServer::Callback::SessionMessageCallback& closure)
+    //设置断开连接的回调
+    bool setDisConnectCallback(const DeviceServer::Callback::SessionDisConnectCallback & cb)
     {
-        OnMessage = closure;
+        OnDisConnect = cb;
         return true;
     }
 
-    bool setSessionCloseCallBack(const DeviceServer::Callback::SessionCloseCallback& closure)
+    //设置订阅的回调
+    bool setSubscribeCallback(const DeviceServer::Callback::SessionSubscribeCallback& cb)
     {
-        OnClose = closure;
+        OnSubscribe = cb;
+        return true;
+    }
+
+    //设置取消事件的回调
+    bool setUnSubscribeCallback(const DeviceServer::Callback::SessionUnSubscribeCallback& cb)
+    {
+        OnUnSubscribe = cb;
+        return true;
+    }
+
+    //设置推送事件的回调
+    bool setPublishCallback(const DeviceServer::Callback::SessionPublishCallback& cb)
+    {
+        OnPublish = cb;
         return true;
     }
 
@@ -215,10 +235,21 @@ private:
     std::string ClientId;
     //会话建立的回调
     DeviceServer::Callback::SessionConnectCallback OnConnect;
-    //会话有消息的时候的回调
-    DeviceServer::Callback::SessionMessageCallback OnMessage;
-    //会话关闭时候的回调
-    DeviceServer::Callback::SessionCloseCallback OnClose;
+    //会话断开连接的回调
+    DeviceServer::Callback::SessionConnectCallback OnDisConnect;
+    //订阅的回调
+    DeviceServer::Callback::SessionSubscribeCallback OnSubscribe;
+    //取消订阅的回调
+    DeviceServer::Callback::SessionUnSubscribeCallback OnUnSubscribe;
+    //推送的时候的回调
+    DeviceServer::Callback::SessionPublishCallback OnPublish;
+    //锁
+    muduo::MutexLock Lock_;
+    std::shared_ptr<DeviceServerLib::MQTTProtocol> protocol;
+    //由于存在特殊情况又接入了一个相同的client_id会话,这时候旧的client_id突然关闭会发生竞争条件，所以要加入一个计数器来防止被错误的销毁
+    int RefCount GUARDED_BY(Lock_);
+    //这个字段用来判断设备是否在线
+    uint8_t IsOnline GUARDED_BY(Lock_);
 };
 }
 #endif //DEVICE_SERVER_MQTTCLIENTSESSION_H

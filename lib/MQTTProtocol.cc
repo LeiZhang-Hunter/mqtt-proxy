@@ -76,27 +76,28 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
             //如果说消息类型是连接消息，那么不需要考虑粘包问题因为下一步我们是需要发送ack的
             case MQTT_CONNECT_TYPE:
                 res = parseOnConnect(buf);
-                if(res)
-                    response.sendConnectAck(conn, 0, 0);
-                else
+                if(!res)
                     return false;
                 break;
 
             case MQTT_SUBSCRIBE_TYPE:
-                if(parseOnSubscribe(buf))
-                    response.sendSubscribeAck(conn, message_id, subscribe_qos_level);
-                else
+                if(!parseOnSubscribe(buf)) {
+                    //回滚字节
+                    bufferRollback(buf);
                     return false;
+                }else{
+                }
                 break;
 
             case MQTT_PUBLISH_TYPE:
                 if(parseOnPublish(buf))
                 {
+                    /*
                     if (qos_level == QUALITY_LEVEL_ONE) {
                         response.sendPublishAck(conn, message_id);
                     } else if (qos_level == QUALITY_LEVEL_TWO) {
                         response.sendPublishRec(conn, message_id);
-                    }
+                    }*/
                 }else{
                     std::cout<<"error6"<<std::endl;
                     bufferRollback(buf);
@@ -107,7 +108,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
             case MQTT_PUBREL_TYPE:
                 //解析出message_id 然后做出回应
                 parseMessageId(buf);
-                response.sendPublishComp(conn, message_id);
+                //response.sendPublishComp(conn, message_id);
                 break;
 
             case MQTT_DISCONNECT_TYPE:
@@ -118,7 +119,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 break;
 
             default:
-                std::cout<<"error5"<<std::endl;
+                //std::cout<<"error5"<<std::endl;
                 bufferRollback(buf);
                 return false;
         }

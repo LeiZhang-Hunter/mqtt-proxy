@@ -10,13 +10,31 @@ namespace DeviceServer{
 class MQTTClientSession;
 
 namespace Callback{
+    //会话的智能指针
     typedef std::shared_ptr<DeviceServer::MQTTClientSession> MQTTClientSessionPtr;
+    /**
+     * 协议层处理的回调
+     */
+    typedef std::function<void()> MQTTProtocolOnConnect;
+    typedef std::function<void()> MQTTProtocolOnDisConnect;
+
+
+    /**
+     * 业务层处理的回调
+     */
     //会话建立连接的回调事件
     typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&)> SessionConnectCallback;
-    //收到会话消息的回调事件
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, muduo::net::Buffer*, muduo::Timestamp)> SessionMessageCallback;
-    //会话关闭的回调事件
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&)> SessionCloseCallback;
+    //会话断开连接的回调事件
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&)> SessionDisConnectCallback;
+    //订阅事件的回调函数
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const std::string&,
+            muduo::Timestamp)> SessionSubscribeCallback;
+    //取消订阅的回调函数
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const std::string&,
+                                muduo::Timestamp)> SessionUnSubscribeCallback;
+    //推送事件的回调函数
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const std::string&, const std::string&,
+                                muduo::Timestamp)> SessionPublishCallback;
 }
 }
 #endif //DEVICE_SERVER_SESSIONCALLBACK_H

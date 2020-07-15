@@ -10,27 +10,27 @@
 namespace DeviceServer
 {
 
-    class MQTTServer
-    {
-    public:
-        MQTTServer(muduo::net::EventLoop* loop, const muduo::net::InetAddress& listenAddr);
+class MQTTServer
+{
+public:
+    MQTTServer(muduo::net::EventLoop* loop, const muduo::net::InetAddress& listenAddr);
 
-        void start();
+    void start();
 
-    private:
+private:
 
-        void onConnection(const muduo::net::TcpConnectionPtr& conn);
+    void onConnection(const muduo::net::TcpConnectionPtr& conn);
 
-        void onMessage(const muduo::net::TcpConnectionPtr& conn,
-                       muduo::net::Buffer* buf,
-                       muduo::Timestamp time
-                );
+    void onMessage(const muduo::net::TcpConnectionPtr& conn,
+                   muduo::net::Buffer* buf,
+                   muduo::Timestamp time
+            );
 
-        void onClose(const muduo::net::TcpConnectionPtr& conn);
+    void onClose(const muduo::net::TcpConnectionPtr& conn);
 
-        muduo::net::EventLoop* loop_;
-        muduo::net::TcpServer server_;
-    };
+    muduo::net::EventLoop* loop_;
+    muduo::net::TcpServer server_;
+};
 }
 
 #endif //DEVICE_SERVER_MQTTSERVER_H
