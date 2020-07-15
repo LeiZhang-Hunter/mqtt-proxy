@@ -3,12 +3,17 @@
 //
 #include "autoload.h"
 
-void DeviceServer::MQTTSessionHandle::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,muduo::Timestamp time)
+void DeviceServer::MQTTSessionHandle::onConnect(const DeviceServer::Callback::MQTTClientSessionPtr& session)
 {
 
 }
 
-void DeviceServer::MQTTSessionHandle::onClose(const muduo::net::TcpConnectionPtr& conn)
+void DeviceServer::MQTTSessionHandle::onMessage(const DeviceServer::Callback::MQTTClientSessionPtr& session, muduo::net::Buffer *buf,muduo::Timestamp time)
+{
+
+}
+
+void DeviceServer::MQTTSessionHandle::onClose(const DeviceServer::Callback::MQTTClientSessionPtr& session)
 {
 
 }

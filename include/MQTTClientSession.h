@@ -8,7 +8,7 @@
 namespace DeviceServer
 {
 
-class MQTTClientSession
+class MQTTClientSession : public muduo::noncopyable,std::enable_shared_from_this<MQTTClientSession>
 {
 public:
 
@@ -153,19 +153,32 @@ public:
         return ProtocolVersion = version;
     }
 
-    bool setSessionMessageCallBack(const muduo::net::MessageCallback& cb)
+    bool setSessionConnectCallBack(const DeviceServer::Callback::SessionConnectCallback& closure)
     {
-        Conn->setMessageCallback(cb);
+        OnConnect = closure;
         return true;
     }
 
-    bool setSessionCloseCallBack(const muduo::net::CloseCallback& cb)
+    bool setSessionMessageCallBack(const DeviceServer::Callback::SessionMessageCallback& closure)
     {
-        Conn->setCloseCallback(cb);
+        OnMessage = closure;
         return true;
     }
 
-    bool startSession()
+    bool setSessionCloseCallBack(const DeviceServer::Callback::SessionCloseCallback& closure)
+    {
+        OnClose = closure;
+        return true;
+    }
+
+    bool startSession();
+
+    void SessionOnMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer*, muduo::Timestamp)
+    {
+
+    }
+
+    void SessionOnClose(const muduo::net::TcpConnectionPtr& conn)
     {
 
     }
@@ -206,7 +219,12 @@ private:
     std::string ProtoName;
     //客户端id
     std::string ClientId;
-    std::function<>
+    //会话建立的回调
+    DeviceServer::Callback::SessionConnectCallback OnConnect;
+    //会话有消息的时候的回调
+    DeviceServer::Callback::SessionMessageCallback OnMessage;
+    //会话关闭时候的回调
+    DeviceServer::Callback::SessionCloseCallback OnClose;
 };
 }
 #endif //DEVICE_SERVER_MQTTCLIENTSESSION_H

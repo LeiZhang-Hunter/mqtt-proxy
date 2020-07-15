@@ -29,6 +29,7 @@
 #include "MQTTType.h"
 #include "MQTTResponse.h"
 #include "MQTTProtocol.h"
+#include "MQTTSessionCallback.h"
 #include "MQTTClientSession.h"
 #include "MQTTClientSessionPool.h"
 #include "MQTTTopicTree.h"

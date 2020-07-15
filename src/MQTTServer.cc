@@ -33,11 +33,12 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
     {
         if(protocol.getMsgType() == MQTT_CONNECT_TYPE)
         {
-            //绑定进入回话
+            //绑定进入会话，这里会绑定设备ID和连接，所以在下面不需要再重复绑定了
             if(!(session = MQTTContainer.sessionPool->bindSession(protocol.getClientId(), conn)))
             {
                 conn->forceClose();
             }else{
+                std::shared_ptr<DeviceServer::MQTTSessionHandle> handle;
                 //绑定会话信息
                 session->setRetain(protocol.getRetain());
                 session->setDupFlag(protocol.getDupFlag());
@@ -50,8 +51,12 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
                 session->setPasswordFlag(protocol.password_flag);
                 session->setKeepAliveTime(protocol.keep_live_time);
                 session->setProtoName(protocol.getProtocolName());
-                session->setSessionMessageCallBack();
-                session->setSessionCloseCallBack();
+                session->setSessionConnectCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onClose, handle, _1));
+                session->setSessionMessageCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onMessage, handle,
+                        _1, _2, _3));
+                session->setSessionCloseCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onClose, handle, _1));
+                //开启会话
+                session->startSession();
             }
         } else {
             conn->forceClose();
