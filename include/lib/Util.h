@@ -4,7 +4,7 @@
 
 #ifndef DEVICE_SERVER_UTIL_H
 #define DEVICE_SERVER_UTIL_H
-namespace DeviceSeverLib {
+namespace DeviceServerLib {
 
 class Util{
 public:

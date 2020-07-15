@@ -5,6 +5,7 @@
 #include "autoload.h"
 
 DeviceServer::MQTTClientSessionPool::MQTTClientSessionPool()
+:Lock_()
 {
 
 }
@@ -19,17 +20,18 @@ std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSession
     //上锁保护
     muduo::MutexLockGuard guard(Lock_);
 
-    //初始化回话信息
+    //初始化会话信息
     ClientIdMapType::iterator session = ClientIdMap.find(client_id);
     //找到了这个客户端id
     if(session != ClientIdMap.end())
     {
         //强制关闭
         ClientIdMap[client_id]->getConn()->forceClose();
-        ClientIdMap[client_id]->setConn(conn);
     }else{
-        ClientIdMap[client_id] = std::make_shared<DeviceServer::MQTTClientSession>();
+        std::shared_ptr<DeviceServer::MQTTClientSession> new_session(new DeviceServer::MQTTClientSession());
+        ClientIdMap[client_id] = new_session;
     }
+    ClientIdMap[client_id]->setConn(conn);
     ClientIdMap[client_id]->setClientId(client_id);
     return ClientIdMap[client_id];
 }

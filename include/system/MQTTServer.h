@@ -7,7 +7,7 @@
 
 
 
-namespace DeviceSever
+namespace DeviceServer
 {
 
     class MQTTServer

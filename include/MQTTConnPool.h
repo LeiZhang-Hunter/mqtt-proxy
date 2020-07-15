@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTCONNPOOL_H
 #define DEVICE_SERVER_MQTTCONNPOOL_H
 
-namespace DeviceSever{
+namespace DeviceServer{
 
 class MQTTConnPool : public muduo::noncopyable
 {
@@ -14,11 +14,11 @@ public:
     explicit MQTTConnPool();
 
     typedef muduo::net::TcpConnectionPtr MQTTConnMapKey;
-    typedef std::shared_ptr<DeviceSeverLib::MQTTProtocol> MQTTConnMapValue;
+    typedef std::shared_ptr<DeviceServerLib::MQTTProtocol> MQTTConnMapValue;
     typedef std::map<MQTTConnMapKey, MQTTConnMapValue> MQTTConnMap;
 
     //注册连接
-    bool registerConn(const muduo::net::TcpConnectionPtr &conn, std::shared_ptr<DeviceSeverLib::MQTTProtocol>&);
+    bool registerConn(const muduo::net::TcpConnectionPtr &conn, std::shared_ptr<DeviceServerLib::MQTTProtocol>&);
 
     //获取连接信息
     MQTTConnMapValue getConnMQTTInfo(const muduo::net::TcpConnectionPtr& conn);

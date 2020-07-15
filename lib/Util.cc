@@ -4,7 +4,7 @@
 
 #include "autoload.h"
 
-std::vector<uint8_t> DeviceSeverLib::Util::encodeRemainingLength(uint32_t remainingLength)
+std::vector<uint8_t> DeviceServerLib::Util::encodeRemainingLength(uint32_t remainingLength)
 {
     int i=0;
     uint8_t digit;

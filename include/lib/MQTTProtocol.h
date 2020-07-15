@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTPROTOCOL_H
 #define DEVICE_SERVER_MQTTPROTOCOL_H
 
-namespace DeviceSeverLib {
+namespace DeviceServerLib {
 /**
  * 这个类主要是负责mqtt协议内容解析的
  */

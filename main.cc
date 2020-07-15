@@ -11,7 +11,7 @@ int main()
     //LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     muduo::net::EventLoop loop;
     muduo::net::InetAddress listenAddr(9500);
-    DeviceSever::MQTTServer server(&loop, listenAddr);
+    DeviceServer::MQTTServer server(&loop, listenAddr);
     server.start();
     loop.loop();
     return 0;

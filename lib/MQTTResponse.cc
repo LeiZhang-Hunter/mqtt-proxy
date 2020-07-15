@@ -3,7 +3,7 @@
 //
 #include "autoload.h"
 
-bool DeviceSeverLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnectionPtr &conn,
+bool DeviceServerLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnectionPtr &conn,
         uint16_t message_id, uint8_t subscribe_qos_level)
 {
     std::vector<uint8_t> buffer;
@@ -29,7 +29,7 @@ bool DeviceSeverLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnect
 }
 
 //发送publish的确认消息
-bool DeviceSeverLib::MQTTResponse::sendPublishAck(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
+bool DeviceServerLib::MQTTResponse::sendPublishAck(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
 {
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
@@ -43,7 +43,7 @@ bool DeviceSeverLib::MQTTResponse::sendPublishAck(const muduo::net::TcpConnectio
 }
 
 //发送publishrec的消息
-bool DeviceSeverLib::MQTTResponse::sendPublishRec(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
+bool DeviceServerLib::MQTTResponse::sendPublishRec(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
 {
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
@@ -57,7 +57,7 @@ bool DeviceSeverLib::MQTTResponse::sendPublishRec(const muduo::net::TcpConnectio
 }
 
 //发送publishrel的消息
-bool DeviceSeverLib::MQTTResponse::sendPublishRel(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
+bool DeviceServerLib::MQTTResponse::sendPublishRel(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
 {
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
@@ -71,7 +71,7 @@ bool DeviceSeverLib::MQTTResponse::sendPublishRel(const muduo::net::TcpConnectio
 }
 
 //发送publishrel的消息
-bool DeviceSeverLib::MQTTResponse::sendPublishComp(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
+bool DeviceServerLib::MQTTResponse::sendPublishComp(const muduo::net::TcpConnectionPtr &conn, uint16_t message_id)
 {
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
@@ -85,7 +85,7 @@ bool DeviceSeverLib::MQTTResponse::sendPublishComp(const muduo::net::TcpConnecti
 }
 
 //解析消息id
-bool DeviceSeverLib::MQTTResponse::sendPingResp(const muduo::net::TcpConnectionPtr &conn)
+bool DeviceServerLib::MQTTResponse::sendPingResp(const muduo::net::TcpConnectionPtr &conn)
 {
     uint8_t message[2] = {MQTT_PINGRESP, 0};
     conn->send(message, 2);

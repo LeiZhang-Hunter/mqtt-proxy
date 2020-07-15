@@ -15,11 +15,12 @@ public:
 
     bool globalInit()
     {
+        sessionPool = std::make_shared<DeviceServer::MQTTClientSessionPool>();
         return true;
     }
 
     muduo::MutexLock mutex;
-    DeviceSeverLib::Util util;
+    DeviceServerLib::Util util;
     std::shared_ptr<DeviceServer::MQTTClientSessionPool> sessionPool;
 
     ~_MQTTContainerGlobal() = default;

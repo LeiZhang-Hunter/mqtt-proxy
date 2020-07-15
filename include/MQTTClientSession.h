@@ -8,7 +8,7 @@
 namespace DeviceServer
 {
 
-class MQTTClientSession : public muduo::noncopyable,std::enable_shared_from_this<MQTTClientSession>
+class MQTTClientSession : public std::enable_shared_from_this<MQTTClientSession>
 {
 public:
 
@@ -173,15 +173,9 @@ public:
 
     bool startSession();
 
-    void SessionOnMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer*, muduo::Timestamp)
-    {
+    void SessionOnMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer*, muduo::Timestamp);
 
-    }
-
-    void SessionOnClose(const muduo::net::TcpConnectionPtr& conn)
-    {
-
-    }
+    void SessionOnClose(const muduo::net::TcpConnectionPtr& conn);
 
     ~MQTTClientSession()
     {

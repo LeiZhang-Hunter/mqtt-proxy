@@ -6,7 +6,7 @@
 
 using namespace std::placeholders;
 
-DeviceSever::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &listenAddr)
+DeviceServer::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &listenAddr)
         : loop_(loop),
           server_(loop, listenAddr, "MQTTServer")
 {
@@ -14,7 +14,7 @@ DeviceSever::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::ne
     server_.setMessageCallback(std::bind(&MQTTServer::onMessage, this, _1, _2, _3));
 }
 
-void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
+void DeviceServer::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
 {
 //    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
 //              << conn->localAddress().toIpPort() << " is "
@@ -24,11 +24,11 @@ void DeviceSever::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& c
     //绑定一个mqtt处理器
 }
 
-void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
+void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
         muduo::Timestamp time)
 {
     std::shared_ptr<DeviceServer::MQTTClientSession> session;
-    DeviceSeverLib::MQTTProtocol protocol = muduo::Singleton<DeviceSeverLib::MQTTProtocol>::instance();
+    DeviceServerLib::MQTTProtocol protocol = muduo::Singleton<DeviceServerLib::MQTTProtocol>::instance();
     if(protocol.parse(buf, conn))
     {
         if(protocol.getMsgType() == MQTT_CONNECT_TYPE)
@@ -55,8 +55,12 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
                 session->setSessionMessageCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onMessage, handle,
                         _1, _2, _3));
                 session->setSessionCloseCallBack(std::bind(&DeviceServer::MQTTSessionHandle::onClose, handle, _1));
-                //开启会话
-                session->startSession();
+                //会话启动失败了直接强制关闭吧
+                bool res = session->startSession();
+                if(!res)
+                {
+                    conn->forceClose();
+                }
             }
         } else {
             conn->forceClose();
@@ -67,12 +71,12 @@ void DeviceSever::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn
     }
 }
 
-void DeviceSever::MQTTServer::start()
+void DeviceServer::MQTTServer::start()
 {
     server_.start();
 }
 
-void DeviceSever::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
+void DeviceServer::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
 {
     std::cout<<"end"<<std::endl;
 }
