@@ -1,0 +1,64 @@
+//
+// Created by zhanglei on 2020/7/16.
+//
+
+#ifndef DEVICE_SERVER_MQTTPROXYCLIENT_H
+#define DEVICE_SERVER_MQTTPROXYCLIENT_H
+
+#include <syscall.h>
+using namespace std::placeholders;
+namespace MQTTProxy
+{
+
+class MQTTProxyClient :public muduo::noncopyable
+{
+public:
+    MQTTProxyClient()
+    {
+
+    }
+
+    void onConnection(const muduo::net::TcpConnectionPtr& conn);
+
+    void onMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer* buf, muduo::Timestamp receiveTime);
+
+
+    bool setEventLoop(muduo::net::EventLoop* loop)
+    {
+        return Loop = loop;
+    }
+
+    bool setConnectAddr(const muduo::net::InetAddress& listenAddr)
+    {
+        ConnectAddr = listenAddr;
+        return true;
+    }
+
+    void connect()
+    {
+        Client->connect();
+    }
+
+    bool start()
+    {
+        Client = std::make_shared<muduo::net::TcpClient>(Loop, ConnectAddr, "MQTTProxy");
+        Client->setConnectionCallback(
+                std::bind(&MQTTProxyClient::onConnection, this, _1));
+        Client->setMessageCallback(
+                std::bind(&MQTTProxyClient::onMessage, this, _1, _2, _3));
+        connect();
+        return true;
+    }
+
+    ~MQTTProxyClient()
+    {
+        std::cout<<"finish"<<std::endl;
+    }
+private:
+    muduo::net::EventLoop* Loop;
+    std::shared_ptr<muduo::net::TcpClient> Client;
+    muduo::net::InetAddress ConnectAddr;
+};
+}
+
+#endif //DEVICE_SERVER_MQTTPROXYCLIENT_H
