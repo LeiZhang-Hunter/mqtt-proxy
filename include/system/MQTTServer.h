@@ -19,6 +19,8 @@ public:
 
 private:
 
+    void onServerStart(muduo::net::EventLoop* loop);
+
     void onConnection(const muduo::net::TcpConnectionPtr& conn);
 
     void onMessage(const muduo::net::TcpConnectionPtr& conn,

@@ -12,6 +12,7 @@ DeviceServer::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::n
 {
     server_.setConnectionCallback(std::bind(&MQTTServer::onConnection, this, _1));
     server_.setMessageCallback(std::bind(&MQTTServer::onMessage, this, _1, _2, _3));
+    server_.setThreadNum(10);
 }
 
 void DeviceServer::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
@@ -34,7 +35,7 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
         if(protocol.getMsgType() == MQTT_CONNECT_TYPE)
         {
             //绑定进入会话，这里会绑定设备ID和连接，所以在下面不需要再重复绑定了
-            if(!(session = MQTTContainer.sessionPool->bindSession(protocol.getClientId(), conn)))
+            if(!(session = MQTTContainer.SessionPool->bindSession(protocol.getClientId(), conn)))
             {
                 conn->forceClose();
             }else{
@@ -74,8 +75,19 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
     }
 }
 
+void DeviceServer::MQTTServer::onServerStart(muduo::net::EventLoop* loop)
+{
+    std::shared_ptr<MQTTProxy::MQTTProxyClient> client(new MQTTProxy::MQTTProxyClient());
+    MQTTContainer.ProxyMap[muduo::CurrentThread::tid()] = client;
+    muduo::net::InetAddress deviceServerListenAddr(9800);
+    MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setEventLoop(loop);
+    MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setConnectAddr(deviceServerListenAddr);
+    MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->start();
+}
+
 void DeviceServer::MQTTServer::start()
 {
+    server_.setThreadInitCallback(std::bind(&MQTTServer::onServerStart, this, _1));
     server_.start();
 }
 

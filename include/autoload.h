@@ -23,6 +23,7 @@
 #include <muduo/base/Timestamp.h>
 #include <muduo/net/Buffer.h>
 #include <muduo/base/Logging.h>
+#include <muduo/net/TcpClient.h>
 
 //business
 #include "Util.h"
@@ -37,6 +38,7 @@
 #include "MQTTConnPool.h"
 #include "MQTTContainerGlobal.h"
 #include "MQTTSessionHandle.h"
+#include "MQTTProxyClient.h"
 #include "MQTTServer.h"
 
 #endif //DEVICE_SERVER_AUTOLOAD_H

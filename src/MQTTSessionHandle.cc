@@ -5,7 +5,7 @@
 //连接建立
 bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session)
 {
-    std::cout<<"connect"<<std::endl;
+
 }
 
 //订阅事件

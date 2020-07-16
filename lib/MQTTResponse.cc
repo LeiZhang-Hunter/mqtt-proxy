@@ -13,7 +13,7 @@ bool DeviceServerLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnec
     //拼接固定报头
     buffer.push_back(MQTT_SUBACK);
     //剩余长度计算
-    std::vector<__uint8_t > encodeRemainingLength = MQTTContainer.util.encodeRemainingLength(remainingLength);
+    std::vector<__uint8_t > encodeRemainingLength = MQTTContainer.Util.encodeRemainingLength(remainingLength);
     buffer.insert(buffer.end(), encodeRemainingLength.begin(), encodeRemainingLength.end());
 
     //可变报头
@@ -34,7 +34,7 @@ bool DeviceServerLib::MQTTResponse::sendPublishAck(const muduo::net::TcpConnecti
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
     publish_ack_buffer.push_back(MQTT_PUBACK);
-    std::vector<uint8_t> remain_length = MQTTContainer.util.encodeRemainingLength(UINT16_LEN);
+    std::vector<uint8_t> remain_length = MQTTContainer.Util.encodeRemainingLength(UINT16_LEN);
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
     publish_ack_buffer.push_back(LSB(message_id));
@@ -48,7 +48,7 @@ bool DeviceServerLib::MQTTResponse::sendPublishRec(const muduo::net::TcpConnecti
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
     publish_ack_buffer.push_back(MQTT_PUBREC);
-    std::vector<uint8_t> remain_length = MQTTContainer.util.encodeRemainingLength(UINT16_LEN);
+    std::vector<uint8_t> remain_length = MQTTContainer.Util.encodeRemainingLength(UINT16_LEN);
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
     publish_ack_buffer.push_back(LSB(message_id));
@@ -62,7 +62,7 @@ bool DeviceServerLib::MQTTResponse::sendPublishRel(const muduo::net::TcpConnecti
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
     publish_ack_buffer.push_back(MQTT_PUBREL);
-    std::vector<uint8_t> remain_length = MQTTContainer.util.encodeRemainingLength(UINT16_LEN);
+    std::vector<uint8_t> remain_length = MQTTContainer.Util.encodeRemainingLength(UINT16_LEN);
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
     publish_ack_buffer.push_back(LSB(message_id));
@@ -76,7 +76,7 @@ bool DeviceServerLib::MQTTResponse::sendPublishComp(const muduo::net::TcpConnect
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
     publish_ack_buffer.push_back(MQTT_PUBCOMP);
-    std::vector<uint8_t> remain_length = MQTTContainer.util.encodeRemainingLength(UINT16_LEN);
+    std::vector<uint8_t> remain_length = MQTTContainer.Util.encodeRemainingLength(UINT16_LEN);
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
     publish_ack_buffer.push_back(LSB(message_id));
