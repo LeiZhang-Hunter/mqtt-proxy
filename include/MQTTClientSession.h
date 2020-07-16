@@ -159,35 +159,35 @@ public:
     //设置连接的回调
     bool setConnectCallback(const DeviceServer::Callback::SessionConnectCallback& cb)
     {
-        OnConnect = cb;
+        OnConnectCallback = cb;
         return true;
     }
 
     //设置断开连接的回调
     bool setDisConnectCallback(const DeviceServer::Callback::SessionDisConnectCallback & cb)
     {
-        OnDisConnect = cb;
+        OnDisConnectCallback = cb;
         return true;
     }
 
     //设置订阅的回调
     bool setSubscribeCallback(const DeviceServer::Callback::SessionSubscribeCallback& cb)
     {
-        OnSubscribe = cb;
+        OnSubscribeCallback = cb;
         return true;
     }
 
     //设置取消事件的回调
     bool setUnSubscribeCallback(const DeviceServer::Callback::SessionUnSubscribeCallback& cb)
     {
-        OnUnSubscribe = cb;
+        OnUnSubscribeCallback = cb;
         return true;
     }
 
     //设置推送事件的回调
     bool setPublishCallback(const DeviceServer::Callback::SessionPublishCallback& cb)
     {
-        OnPublish = cb;
+        OnPublishCallback = cb;
         return true;
     }
 
@@ -196,6 +196,16 @@ public:
     void SessionOnMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer*, muduo::Timestamp);
 
     void SessionOnClose(const muduo::net::TcpConnectionPtr& conn);
+
+    void OnConnect();
+
+    void OnDisConnect();
+
+    void OnSubscribe(const DeviceServer::MQTTSubscribe& subscribe);
+
+    void OnUnSubscribe(const DeviceServer::MQTTSubscribe& subscribe);
+
+    void OnPublish(const DeviceServer::MQTTSubscribe& subscribe, const std::string& message);
 
     ~MQTTClientSession()
     {
@@ -234,17 +244,18 @@ private:
     //客户端id
     std::string ClientId;
     //会话建立的回调
-    DeviceServer::Callback::SessionConnectCallback OnConnect;
+    DeviceServer::Callback::SessionConnectCallback OnConnectCallback;
     //会话断开连接的回调
-    DeviceServer::Callback::SessionConnectCallback OnDisConnect;
+    DeviceServer::Callback::SessionConnectCallback OnDisConnectCallback;
     //订阅的回调
-    DeviceServer::Callback::SessionSubscribeCallback OnSubscribe;
+    DeviceServer::Callback::SessionSubscribeCallback OnSubscribeCallback;
     //取消订阅的回调
-    DeviceServer::Callback::SessionUnSubscribeCallback OnUnSubscribe;
+    DeviceServer::Callback::SessionUnSubscribeCallback OnUnSubscribeCallback;
     //推送的时候的回调
-    DeviceServer::Callback::SessionPublishCallback OnPublish;
+    DeviceServer::Callback::SessionPublishCallback OnPublishCallback;
     //锁
     muduo::MutexLock Lock_;
+    //每一个会话都应该有一个协议处理器
     std::shared_ptr<DeviceServerLib::MQTTProtocol> protocol;
     //由于存在特殊情况又接入了一个相同的client_id会话,这时候旧的client_id突然关闭会发生竞争条件，所以要加入一个计数器来防止被错误的销毁
     int RefCount GUARDED_BY(Lock_);

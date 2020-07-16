@@ -27,6 +27,7 @@
 //business
 #include "Util.h"
 #include "MQTTType.h"
+#include "MQTTSubscribe.h"
 #include "MQTTResponse.h"
 #include "MQTTSessionCallback.h"
 #include "MQTTProtocol.h"

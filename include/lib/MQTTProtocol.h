@@ -63,35 +63,35 @@ public:
     }
 
     //设置连接的回调
-    bool setConnectCallback(const DeviceServer::Callback::SessionConnectCallback& cb)
+    bool setConnectCallback(const DeviceServer::Callback::MQTTProtocolOnConnect& cb)
     {
         OnConnect = cb;
         return true;
     }
 
     //设置断开连接的回调
-    bool setDisConnectCallback(const DeviceServer::Callback::SessionDisConnectCallback & cb)
+    bool setDisConnectCallback(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb)
     {
         OnDisConnect = cb;
         return true;
     }
 
     //设置订阅的回调
-    bool setSubscribeCallback(const DeviceServer::Callback::SessionSubscribeCallback& cb)
+    bool setSubscribeCallback(const DeviceServer::Callback::MQTTProtocolOnSubscribe& cb)
     {
         OnSubscribe = cb;
         return true;
     }
 
     //设置取消事件的回调
-    bool setUnSubscribeCallback(const DeviceServer::Callback::SessionUnSubscribeCallback& cb)
+    bool setUnSubscribeCallback(const DeviceServer::Callback::MQTTProtocolOnUnSubscribe& cb)
     {
         OnUnSubscribe = cb;
         return true;
     }
 
     //设置推送事件的回调
-    bool setPublishCallback(const DeviceServer::Callback::SessionPublishCallback& cb)
+    bool setPublishCallback(const DeviceServer::Callback::MQTTProtocolOnPublish& cb)
     {
         OnPublish = cb;
         return true;
@@ -147,15 +147,15 @@ public:
     uint16_t parseMessageId(muduo::net::Buffer *buf);
 
     //会话建立的回调
-    DeviceServer::Callback::SessionConnectCallback OnConnect;
+    DeviceServer::Callback::MQTTProtocolOnConnect OnConnect;
     //会话断开连接的回调
-    DeviceServer::Callback::SessionConnectCallback OnDisConnect;
+    DeviceServer::Callback::MQTTProtocolOnDisConnect OnDisConnect;
     //订阅的回调
-    DeviceServer::Callback::SessionSubscribeCallback OnSubscribe;
+    DeviceServer::Callback::MQTTProtocolOnSubscribe OnSubscribe;
     //取消订阅的回调
-    DeviceServer::Callback::SessionUnSubscribeCallback OnUnSubscribe;
+    DeviceServer::Callback::MQTTProtocolOnUnSubscribe OnUnSubscribe;
     //推送的时候的回调
-    DeviceServer::Callback::SessionPublishCallback OnPublish;
+    DeviceServer::Callback::MQTTProtocolOnPublish OnPublish;
 };
 }
 #endif //DEVICE_SERVER_MQTTPROTOCOL_H

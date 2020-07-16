@@ -16,6 +16,9 @@ namespace Callback{
      * 协议层处理的回调
      */
     typedef std::function<void()> MQTTProtocolOnConnect;
+    typedef std::function<void(const DeviceServer::MQTTSubscribe&)> MQTTProtocolOnSubscribe;
+    typedef std::function<void(const DeviceServer::MQTTSubscribe&)> MQTTProtocolOnUnSubscribe;
+    typedef std::function<void(const DeviceServer::MQTTSubscribe&, const std::string& message)> MQTTProtocolOnPublish;
     typedef std::function<void()> MQTTProtocolOnDisConnect;
 
 
@@ -27,14 +30,14 @@ namespace Callback{
     //会话断开连接的回调事件
     typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&)> SessionDisConnectCallback;
     //订阅事件的回调函数
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const std::string&,
-            muduo::Timestamp)> SessionSubscribeCallback;
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&,
+            const DeviceServer::MQTTSubscribe&)> SessionSubscribeCallback;
     //取消订阅的回调函数
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const std::string&,
-                                muduo::Timestamp)> SessionUnSubscribeCallback;
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&,
+            const DeviceServer::MQTTSubscribe&)> SessionUnSubscribeCallback;
     //推送事件的回调函数
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const std::string&, const std::string&,
-                                muduo::Timestamp)> SessionPublishCallback;
+    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const DeviceServer::MQTTSubscribe&,
+            const std::string&)> SessionPublishCallback;
 }
 }
 #endif //DEVICE_SERVER_SESSIONCALLBACK_H

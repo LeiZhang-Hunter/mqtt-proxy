@@ -54,9 +54,9 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 //设置mqtt的主要事件
                 //触发设备上线事件
                 handle->OnConnect(session);
-                session->setSubscribeCallback(std::bind(&MQTTSessionHandle::OnSubscribe, handle, _1, _2, _3));
-                session->setUnSubscribeCallback(std::bind(&MQTTSessionHandle::OnUnSubscribe, handle, _1, _2, _3));
-                session->setPublishCallback(std::bind(&MQTTSessionHandle::OnPublish, handle, _1, _2, _3, _4));
+                session->setSubscribeCallback(std::bind(&MQTTSessionHandle::OnSubscribe, handle, _1, _2));
+                session->setUnSubscribeCallback(std::bind(&MQTTSessionHandle::OnUnSubscribe, handle, _1, _2));
+                session->setPublishCallback(std::bind(&MQTTSessionHandle::OnPublish, handle, _1, _2, _3));
                 session->setDisConnectCallback(std::bind(&MQTTSessionHandle::OnDisConnect, handle, _1));
                 //会话启动失败了直接强制关闭吧
                 bool res = session->startSession();

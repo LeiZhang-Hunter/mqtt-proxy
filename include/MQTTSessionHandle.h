@@ -16,17 +16,15 @@ public:
     bool OnConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session);
 
     //订阅事件
-    bool OnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session, const std::string& topic, muduo::Timestamp);
+    bool OnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session, const DeviceServer::MQTTSubscribe& subscribe);
 
     //取消订阅事件
-    bool OnUnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session, const std::string& topic, muduo::Timestamp);
+    bool OnUnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session, const DeviceServer::MQTTSubscribe& subscribe);
 
     //收到相关主题的推送
     void OnPublish(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-                   const std::string& topic,
-                   const std::string& message,
-                   muduo::Timestamp time
-    );
+                   const DeviceServer::MQTTSubscribe& subscribe,
+                   const std::string& message);
 
     //关闭会话触发的事件
     bool OnDisConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session);

@@ -10,21 +10,21 @@ bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQ
 
 //订阅事件
 bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-        const std::string& topic, muduo::Timestamp timestamp)
+        const DeviceServer::MQTTSubscribe& subscribe)
 {
 
 }
 
 //取消订阅事件
 bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-        const std::string& topic, muduo::Timestamp timestamp)
+        const DeviceServer::MQTTSubscribe& subscribe)
 {
 
 }
 
 //收到相关主题的推送
 void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-        const std::string& topic, const std::string& message, muduo::Timestamp timestamp
+        const DeviceServer::MQTTSubscribe& subscribe, const std::string& message
 )
 {
 
