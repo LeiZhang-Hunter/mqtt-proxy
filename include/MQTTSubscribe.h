@@ -18,6 +18,7 @@ public:
     std::string message;
     uint8_t QosLevel;
     std::map<std::string, DeviceServer::MQTTClientSession> sessionMap;
+    std::map<std::string, DeviceServer::MQTTSubscribe> sonTopic;
 };
 }
 #endif //DEVICE_SERVER_MQTTSUBSCRIBE_H
