@@ -12,7 +12,7 @@ bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQ
 bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
         const DeviceServer::MQTTSubscribe& subscribe)
 {
-
+    std::cout<<"Subscribe"<<std::endl;
 }
 
 //取消订阅事件

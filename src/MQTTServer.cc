@@ -53,7 +53,7 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 session->setProtoName(protocol.getProtocolName());
                 //设置mqtt的主要事件
                 //触发设备上线事件
-                handle->OnConnect(session);
+                session->setConnectCallback(std::bind(&MQTTSessionHandle::OnConnect, handle, _1));
                 session->setSubscribeCallback(std::bind(&MQTTSessionHandle::OnSubscribe, handle, _1, _2));
                 session->setUnSubscribeCallback(std::bind(&MQTTSessionHandle::OnUnSubscribe, handle, _1, _2));
                 session->setPublishCallback(std::bind(&MQTTSessionHandle::OnPublish, handle, _1, _2, _3));

@@ -17,7 +17,7 @@ public:
     MQTTClientSession()
     :Lock_(), RefCount(0), IsOnline(Offline)
     {
-
+        protocol = std::make_shared<DeviceServerLib::MQTTProtocol>();
     }
 
     bool setConn(const muduo::net::TcpConnectionPtr& connection)

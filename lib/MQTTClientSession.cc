@@ -10,7 +10,7 @@ bool DeviceServer::MQTTClientSession::startSession()
     std::weak_ptr<muduo::net::TcpConnection> weak_conn;
     if(weak_conn.expired()) {
         //设置协议处理器的回调处理函数
-        protocol->setConnectCallback(std::bind(&MQTTClientSession::OnConnect, shared_from_this()));
+        OnConnect();
         protocol->setDisConnectCallback(std::bind(&MQTTClientSession::OnDisConnect, shared_from_this()));
         protocol->setSubscribeCallback(std::bind(&MQTTClientSession::OnSubscribe, shared_from_this(), _1));
         protocol->setUnSubscribeCallback(std::bind(&MQTTClientSession::OnUnSubscribe, shared_from_this(), _1));
