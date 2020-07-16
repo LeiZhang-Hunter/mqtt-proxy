@@ -15,7 +15,7 @@ class MQTTClientSession : public std::enable_shared_from_this<MQTTClientSession>
 public:
 
     MQTTClientSession()
-    :Lock_(), RefCount(0), IsOnline(0)
+    :Lock_(), RefCount(0), IsOnline(Offline)
     {
 
     }
