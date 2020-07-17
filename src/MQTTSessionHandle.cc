@@ -5,7 +5,11 @@
 //连接建立
 bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session)
 {
-
+    std::cout<<"Connect"<<std::endl;
+    uint8_t connectAck = 0;
+    if(session->getCleanSession() == 0)
+        connectAck |= 0x01;
+    response.sendConnectAck(session->getConn(), connectAck, CONNACK_ACCEPTED);
 }
 
 //订阅事件

@@ -23,7 +23,7 @@ bool DeviceServer::MQTTClientSession::startSession()
         IsOnline = Online;
         return true;
     }else{
-        LOG_WARN << getClientId()<< "Conn has been destroy";
+        LOG_WARN << getClientId()<< "Conn("<<getClientId()<<") has been destroy";
         return  false;
     }
 }

@@ -8,6 +8,7 @@
 namespace DeviceServer{
 
 class MQTTClientSession;
+class MQTTSubscribe;
 
 namespace Callback{
     //会话的智能指针

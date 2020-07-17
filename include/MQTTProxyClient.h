@@ -22,6 +22,8 @@ public:
 
     void onMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer* buf, muduo::Timestamp receiveTime);
 
+    void onClose(const muduo::net::TcpConnectionPtr& conn);
+
 
     bool setEventLoop(muduo::net::EventLoop* loop)
     {
@@ -46,6 +48,7 @@ public:
                 std::bind(&MQTTProxyClient::onConnection, this, _1));
         Client->setMessageCallback(
                 std::bind(&MQTTProxyClient::onMessage, this, _1, _2, _3));
+        Client->enableRetry();
         connect();
         return true;
     }

@@ -13,6 +13,15 @@ void MQTTProxy::MQTTProxyClient::onMessage(const muduo::net::TcpConnectionPtr &c
 
 void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr &conn)
 {
-    if (!conn->connected())
-        Loop->quit();
+
+    //conn->setCloseCallback(std::bind(&MQTTProxyClient::onClose, this, _1));
+}
+
+void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &conn)
+{
+
+    if (!conn->connected()) {
+        std::cout<<"close"<<std::endl;
+
+    }
 }

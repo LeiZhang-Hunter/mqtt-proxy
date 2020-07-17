@@ -28,6 +28,10 @@ public:
 
     //关闭会话触发的事件
     bool OnDisConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session);
+
+private:
+    //响应处理器用来处理mqtt的响应,现阶段是用来测试我认为这个响应器应该是放在代理节点的
+    DeviceServerLib::MQTTResponse response;
 };
 }
 #endif //DEVICE_SERVER_MQTTSESSIONHANDLE_H

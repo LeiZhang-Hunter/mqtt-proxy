@@ -18,7 +18,6 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
 
         if(last_read_byte < UINT16_LEN)
         {
-            std::cout<<"error1"<<std::endl;
             bufferRollback(buf);
             return false;
         }
@@ -40,7 +39,6 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
             i++;
             if(i > 4)
             {
-                std::cout<<"error2"<<std::endl;
                 bufferRollback(buf);
                 return false;
             }
@@ -86,20 +84,35 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                     bufferRollback(buf);
                     return false;
                 }else{
+                    //主题
+                    if(OnSubscribe) {
+                        DeviceServer::MQTTSubscribe subscribe;
+                        subscribe.messageId = message_id;
+                        subscribe.topic = payload;
+                        subscribe.QosLevel = subscribe_qos_level;
+                        OnSubscribe(subscribe);
+                    }
                 }
                 break;
 
             case MQTT_PUBLISH_TYPE:
                 if(parseOnPublish(buf))
                 {
-                    /*
-                    if (qos_level == QUALITY_LEVEL_ONE) {
-                        response.sendPublishAck(conn, message_id);
-                    } else if (qos_level == QUALITY_LEVEL_TWO) {
-                        response.sendPublishRec(conn, message_id);
-                    }*/
+
+                    //推送
+                    if(OnPublish)
+                    {
+                        DeviceServer::MQTTSubscribe subscribe;
+                        subscribe.messageId = message_id;
+                        subscribe.topic = topic_name;
+                        OnPublish(subscribe, payload);
+                    }
+//                    if (qos_level == QUALITY_LEVEL_ONE) {
+//                        response.sendPublishAck(conn, message_id);
+//                    } else if (qos_level == QUALITY_LEVEL_TWO) {
+//                        response.sendPublishRec(conn, message_id);
+//                    }
                 }else{
-                    std::cout<<"error6"<<std::endl;
                     bufferRollback(buf);
                     return false;
                 }
@@ -108,7 +121,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
             case MQTT_PUBREL_TYPE:
                 //解析出message_id 然后做出回应
                 parseMessageId(buf);
-                //response.sendPublishComp(conn, message_id);
+                response.sendPublishComp(conn, message_id);
                 break;
 
             case MQTT_DISCONNECT_TYPE:
@@ -119,7 +132,6 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 break;
 
             default:
-                //std::cout<<"error5"<<std::endl;
                 bufferRollback(buf);
                 return false;
         }

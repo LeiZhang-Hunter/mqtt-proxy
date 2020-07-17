@@ -42,6 +42,10 @@ enum{
 #define QUALITY_LEVEL_ONE 1
 #define QUALITY_LEVEL_TWO 2
 
+#define CONNACK_ACCEPTED 0
+#define CONNACK_REFUSED_PROTOCOL_VERSION 1
+#define CONNACK_REFUSED_IDENTIFIER_REJECTED 2
+
 //获取字节高位
 #define MSB(message_id) static_cast<uint8_t>((message_id & 0xFF00) >> 8)
 #define LSB(message_id) static_cast<uint8_t>(message_id & 0x00FF)

@@ -77,7 +77,7 @@ public:
     }
 
     //设置订阅的回调
-    bool setSubscribeCallback(const DeviceServer::Callback::MQTTProtocolOnSubscribe& cb)
+    bool setSubscribeCallback(const DeviceServer::Callback::MQTTProtocolOnSubscribe cb)
     {
         OnSubscribe = cb;
         return true;
