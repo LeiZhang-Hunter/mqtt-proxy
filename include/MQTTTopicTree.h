@@ -15,7 +15,7 @@ class MQTTSubscribeTreeNode
 public:
     std::string topic;
     std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>> sessionMap;
-    std::map<std::string, DeviceServer::MQTTSubscribeTreeNode> sonSubscribe;
+    std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>> sonSubscribe;
 };
 //订阅树
 class MQTTTopicTree
