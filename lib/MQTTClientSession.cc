@@ -54,6 +54,8 @@ void DeviceServer::MQTTClientSession::OnDisConnect()
 
 void DeviceServer::MQTTClientSession::OnSubscribe(const DeviceServer::MQTTSubscribe &subscribe)
 {
+    //加入订阅树
+    MQTTContainer.TopicTree->addSubscribe(subscribe, shared_from_this());
     OnSubscribeCallback(shared_from_this(), subscribe);
 }
 

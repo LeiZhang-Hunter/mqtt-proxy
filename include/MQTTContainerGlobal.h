@@ -21,6 +21,7 @@ public:
     bool globalInit()
     {
         SessionPool = std::make_shared<DeviceServer::MQTTClientSessionPool>();
+        TopicTree = std::make_shared<DeviceServer::MQTTTopicTree>();
         return true;
     }
 
@@ -32,6 +33,7 @@ public:
     muduo::MutexLock Mutex;
     DeviceServerLib::Util Util;
     std::shared_ptr<DeviceServer::MQTTClientSessionPool> SessionPool;
+    std::shared_ptr<DeviceServer::MQTTTopicTree> TopicTree;
     std::map<int, std::shared_ptr<MQTTProxy::MQTTProxyClient>> ProxyMap;
     ~_MQTTContainerGlobal() = default;
 }MQTTContainerGlobal;
