@@ -32,8 +32,7 @@ bool DeviceServer::MQTTClientSession::startSession()
 void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer* buf,
         muduo::Timestamp)
 {
-    auto protocol = muduo::Singleton<DeviceServerLib::MQTTProtocol>::instance();
-    protocol.parse(buf, conn);
+    protocol->parse(buf, conn);
 }
 
 //关闭连接的时候触发
