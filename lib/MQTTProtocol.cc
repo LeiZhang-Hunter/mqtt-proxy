@@ -303,4 +303,5 @@ uint16_t DeviceServerLib::MQTTProtocol::parseMessageId(muduo::net::Buffer *buf)
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;
     transaction_read_byte += UINT16_LEN;
+    return message_id;
 }
