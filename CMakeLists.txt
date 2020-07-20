@@ -11,9 +11,16 @@ INCLUDE_DIRECTORIES(
         "${PROJECT_SOURCE_DIR}/include/lib/"
         "${PROJECT_SOURCE_DIR}/include/controller"
         "${PROJECT_SOURCE_DIR}/include/system"
+        "${PROJECT_SOURCE_DIR}/vendor/proto/json/include"
+        "${PROJECT_SOURCE_DIR}/vendor/proto/json/src/lib_json"
         ${PROJECT_SOURCE_DIR}
         ${MUDUO_DIR}
 )
+
+file(GLOB_RECURSE VENDOR_LIB ${PROJECT_SOURCE_DIR}/vendor/proto/json/src/lib_json/*.cpp)
+
+#生成vendor库
+add_library(vendor SHARED ${VENDOR_LIB})
 
 file(GLOB_RECURSE LIB_SRC ${PROJECT_SOURCE_DIR}/lib/*.cc)
 
@@ -31,4 +38,4 @@ set(SOURCE_SRC
 add_executable(device-server ${SOURCE_SRC})
 
 #定义连接文件
-target_link_libraries(device-server  muduo_net muduo_base pthread device-server-lib)
+target_link_libraries(device-server  muduo_net muduo_base pthread device-server-lib vendor)

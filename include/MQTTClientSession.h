@@ -191,6 +191,28 @@ public:
         return true;
     }
 
+    bool setUserName(const std::string& username)
+    {
+        Username = username;
+        return true;
+    }
+
+    const std::string& getUserName()
+    {
+        return Username;
+    }
+
+    bool setPassword(const std::string& password)
+    {
+        Password = password;
+        return true;
+    }
+
+    const std::string& getPassword()
+    {
+        return Password;
+    }
+
     bool startSession();
 
     void SessionOnMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer*, muduo::Timestamp);
@@ -261,6 +283,10 @@ private:
     int RefCount GUARDED_BY(Lock_);
     //这个字段用来判断设备是否在线
     uint8_t IsOnline GUARDED_BY(Lock_);
+    //用户名
+    std::string Username;
+    //密码
+    std::string Password;
 };
 }
 #endif //DEVICE_SERVER_MQTTCLIENTSESSION_H

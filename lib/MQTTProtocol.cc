@@ -75,7 +75,10 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
             case MQTT_CONNECT_TYPE:
                 res = parseOnConnect(buf);
                 if(!res)
+                {
+                    bufferRollback(buf);
                     return false;
+                }
                 break;
 
             case MQTT_SUBSCRIBE_TYPE:
@@ -209,6 +212,33 @@ bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     last_read_byte-=topic_name_len;
     transaction_read_byte += topic_name_len;
 
+    //如果说要设置账号
+    if(username_flag)
+    {
+        username_length = buf->peekInt16();
+        buf->retrieve(UINT16_LEN);
+        last_read_byte -= UINT16_LEN;
+        transaction_read_byte += UINT16_LEN;
+
+        username.assign(buf->peek(), username_length);
+        buf->retrieve(username_length);
+        last_read_byte-=username_length;
+        transaction_read_byte += username_length;
+    }
+
+    //如果说要设置密码
+    if(password_flag)
+    {
+        password_length = buf->peekInt16();
+        buf->retrieve(UINT16_LEN);
+        last_read_byte -= UINT16_LEN;
+        transaction_read_byte += UINT16_LEN;
+
+        password.assign(buf->peek(), password_length);
+        buf->retrieve(password_length);
+        last_read_byte-=password_length;
+        transaction_read_byte += password_length;
+    }
     return true;
 }
 

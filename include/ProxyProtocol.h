@@ -15,7 +15,11 @@
  * |          类型
  * |------------------------------
  * |
+ * |          设备id
+ * |-------------------------------
+ * |
  * |          错误码
+ * |
  * |-------------------------------
  * |
  * |          剩余长度
@@ -34,15 +38,19 @@ namespace MQTTProxy
 typedef struct _MQTTProxyProtocol
 {
     //消息类型
-    uint8_t message_type;
+    uint8_t MessageType;
     //消息结果 用来存储错误码
-    uint8_t message_no;
-    //载荷长度
-    uint32_t  message_length;
+    uint8_t MessageNo;
+    //客户端id的长度
+    uint32_t ClientIdLength;
+    //设备id
+    std::string ClientId;
+    //消息长度
+    uint32_t  MessageLength;
     //载荷
-    std::vector<char> payload;
+    std::vector<uint8_t> Payload;
     //CRC校验用来核对
-    uint16_t message_crc;
+    uint16_t MessageCrc;
 }MQTTProxyProtocol;
 
 //协议的类型
@@ -57,6 +65,12 @@ enum{
     PUBLISH_MESSAGE,
     DISCONNECT,
     DISCONNECT_MESSAGE
+};
+
+//协议的类型
+enum{
+    RETURN_OK = 0,
+    RETURN_FAILED = 1
 };
 }
 

@@ -27,6 +27,7 @@
 
 //business
 #include "Util.h"
+#include "ProxyProtocol.h"
 #include "MQTTType.h"
 #include "MQTTSessionCallback.h"
 #include "MQTTSubscribe.h"

@@ -137,8 +137,14 @@ public:
     std::map<std::string, uint8_t> subscribe_map;
     int parse_mqtt_errno = 0;
 
+    uint16_t username_length = 0;
+
+    uint16_t password_length = 0;
+
     std::string protocol_name;
     std::string client_id;
+    std::string username;
+    std::string password;
 
     //这里用来存储tcp的连接用来发送反馈的
     bool parseOnConnect(muduo::net::Buffer *buf);

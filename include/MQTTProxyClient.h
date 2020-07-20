@@ -5,7 +5,6 @@
 #ifndef DEVICE_SERVER_MQTTPROXYCLIENT_H
 #define DEVICE_SERVER_MQTTPROXYCLIENT_H
 
-#include <syscall.h>
 using namespace std::placeholders;
 namespace MQTTProxy
 {
@@ -53,6 +52,8 @@ public:
         return true;
     }
 
+    void sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol);
+
     ~MQTTProxyClient()
     {
         std::cout<<"finish"<<std::endl;
@@ -61,6 +62,7 @@ private:
     muduo::net::EventLoop* Loop;
     std::shared_ptr<muduo::net::TcpClient> Client;
     muduo::net::InetAddress ConnectAddr;
+    muduo::net::TcpConnectionPtr Conn;
 };
 }
 

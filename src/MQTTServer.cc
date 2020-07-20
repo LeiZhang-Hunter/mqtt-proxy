@@ -12,7 +12,7 @@ DeviceServer::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::n
 {
     server_.setConnectionCallback(std::bind(&MQTTServer::onConnection, this, _1));
     server_.setMessageCallback(std::bind(&MQTTServer::onMessage, this, _1, _2, _3));
-    server_.setThreadNum(10);
+    server_.setThreadNum(1);
 }
 
 void DeviceServer::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
@@ -49,7 +49,15 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 session->setWillQos(protocol.will_qos);
                 session->setWillRetain(protocol.will_retain);
                 session->setUserNameFlag(protocol.username_flag);
+                if(protocol.username_flag)
+                {
+                    session->setUserName(protocol.username);
+                }
                 session->setPasswordFlag(protocol.password_flag);
+                if(protocol.password_flag)
+                {
+                    session->setPassword(protocol.password);
+                }
                 session->setKeepAliveTime(protocol.keep_live_time);
                 session->setProtoName(protocol.getProtocolName());
                 //设置mqtt的主要事件
@@ -67,6 +75,7 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 }
             }
         } else {
+            std::cout<<"error"<<std::endl;
             conn->forceClose();
         }
     } else {
