@@ -72,6 +72,15 @@ enum{
     RETURN_OK = 0,
     RETURN_FAILED = 1
 };
+
+class ProxyProtocolHandle
+{
+
+public:
+
+    //解析协议内容
+    bool parse();
+};
 }
 
 #endif //DEVICE_SERVER_PROXYPROTOCOL_H
