@@ -12,7 +12,10 @@
  *
  * -------------------------------
  * |
- * |          类型
+ * |          代理协议类型(0是MQTT代理)
+ * |
+ * |------------------------------
+ * |          MQTT消息类型
  * |------------------------------
  * |
  * |          设备id
@@ -37,6 +40,8 @@ namespace MQTTProxy
 //MQTT代理的协议
 typedef struct _MQTTProxyProtocol
 {
+    //协议类型0的话是mqtt代理的协议
+    uint8_t ProtocolType = 0;
     //消息类型
     uint8_t MessageType;
     //消息结果 用来存储错误码

@@ -4,3 +4,7 @@
 
 #include "autoload.h"
 
+bool MQTTProxy::ProxyProtocolHandle::parse()
+{
+    return true;
+}

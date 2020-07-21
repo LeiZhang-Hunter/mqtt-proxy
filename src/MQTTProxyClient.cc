@@ -27,8 +27,11 @@ void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &con
 
 void MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol)
 {
+    //导入协议类型
+
     //压缩封装协议到设备中台去查询设备是否可以接入
     std::vector<uint8_t> buffer;
+    buffer.push_back(protocol.ProtocolType);
     //消息类型
     buffer.push_back(protocol.MessageType);
     //消息的错误码
