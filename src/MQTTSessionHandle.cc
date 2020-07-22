@@ -35,6 +35,7 @@ bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQ
                 encode_string.begin(),
                 encode_string.end());
     }
+    protocol.MessageLength = protocol.Payload.size();
     //发送消息到设备中心
     MQTTContainer.getProxyClient()->sendProxyData(protocol);
     //response.sendConnectAck(session->getConn(), connectAck, CONNACK_ACCEPTED);

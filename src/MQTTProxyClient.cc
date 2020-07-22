@@ -51,5 +51,8 @@ void MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtoco
     buffer.push_back(MSB(crc16));
     buffer.push_back(LSB(crc16));
     //发送buffer
-    Conn->send(buffer.data(), buffer.size());
+    if(Conn)
+    {
+        Conn->send(buffer.data(), buffer.size());
+    }
 }
