@@ -5,8 +5,6 @@
 #ifndef DEVICE_SERVER_MQTTSUBSCRIBE_H
 #define DEVICE_SERVER_MQTTSUBSCRIBE_H
 
-#include "autoload.h"
-
 namespace DeviceServer {
 
 class MQTTClientSession;
