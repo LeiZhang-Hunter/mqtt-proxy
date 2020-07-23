@@ -54,7 +54,7 @@ bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::
     protocol.ClientIdLength = session->getClientId().length();
     //客户端id
     protocol.ClientId = session->getClientId();
-    //查看是否要输入账号密码，如果要输入则需要在载荷中加入账号和密码
+    //加入订阅的主题
     Json::Value proto_builder;
     proto_builder["topic"] = subscribe.topic;
     if(proto_builder.size() > 0)
@@ -83,7 +83,7 @@ bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback
     protocol.ClientIdLength = session->getClientId().length();
     //客户端id
     protocol.ClientId = session->getClientId();
-    //查看是否要输入账号密码，如果要输入则需要在载荷中加入账号和密码
+    //加入取消订阅的主题
     Json::Value proto_builder;
     proto_builder["topic"] = subscribe.topic;
     if(proto_builder.size() > 0)
@@ -113,11 +113,17 @@ void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQ
     protocol.ClientIdLength = session->getClientId().length();
     //客户端id
     protocol.ClientId = session->getClientId();
-    //查看是否要输入账号密码，如果要输入则需要在载荷中加入账号和密码
-    protocol.Payload.insert(
-            protocol.Payload.end(),
-            message.begin(),
-            message.end());
+    Json::Value proto_builder;
+    proto_builder["topic"] = subscribe.topic;
+    proto_builder["message"] = message;
+    if(proto_builder.size() > 0)
+    {
+        Json::String encode_string = MQTTContainer.Util.jsonEncode(proto_builder);
+        protocol.Payload.insert(
+                protocol.Payload.end(),
+                encode_string.begin(),
+                encode_string.end());
+    }
     protocol.MessageLength = protocol.Payload.size();
     //发送消息到设备中心
     MQTTContainer.getProxyClient()->sendProxyData(protocol);
