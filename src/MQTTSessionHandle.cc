@@ -106,7 +106,7 @@ void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQ
 {
     MQTTProxy::MQTTProxyProtocol protocol;
     //连接的标志
-    protocol.MessageType = MQTTProxy::UNSUBSCRIBE;
+    protocol.MessageType = MQTTProxy::PUBLISH;
     //返回码
     protocol.MessageNo = MQTTProxy::RETURN_OK;
     //客户端id的长度
@@ -134,7 +134,7 @@ bool DeviceServer::MQTTSessionHandle::OnDisConnect(const DeviceServer::Callback:
 {
     MQTTProxy::MQTTProxyProtocol protocol;
     //连接的标志
-    protocol.MessageType = MQTTProxy::UNSUBSCRIBE;
+    protocol.MessageType = MQTTProxy::DISCONNECT;
     //返回码
     protocol.MessageNo = MQTTProxy::RETURN_OK;
     //客户端id的长度
