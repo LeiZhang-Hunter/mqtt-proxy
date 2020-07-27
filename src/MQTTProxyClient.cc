@@ -8,7 +8,9 @@ void MQTTProxy::MQTTProxyClient::onMessage(const muduo::net::TcpConnectionPtr &c
         muduo::Timestamp receiveTime)
 {
     //解析返回的协议数据如果说连接成功则给下端发送连接确认
-    buf->retrieveAll();
+    MQTTProxy::ProxyProtocolHandle handle;
+    handle.parse(buf);
+
 }
 
 void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr &conn)

@@ -18,10 +18,13 @@
  * |          MQTT消息类型
  * |------------------------------
  * |
- * |          设备id
+ * |          错误码
  * |-------------------------------
  * |
- * |          错误码
+ * |          设备id长度
+ * |
+ * |--------------------------------
+ * |          设备id
  * |
  * |-------------------------------
  * |
@@ -37,11 +40,13 @@
 namespace MQTTProxy
 {
 
+#define MQTT_PROXY 0
+
 //MQTT代理的协议
 typedef struct _MQTTProxyProtocol
 {
     //协议类型0的话是mqtt代理的协议
-    uint8_t ProtocolType = 0;
+    uint8_t ProtocolType = MQTT_PROXY;
     //消息类型
     uint8_t MessageType;
     //消息结果 用来存储错误码
@@ -84,7 +89,7 @@ class ProxyProtocolHandle
 public:
 
     //解析协议内容
-    bool parse();
+    bool parse(muduo::net::Buffer* buffer);
 };
 }
 

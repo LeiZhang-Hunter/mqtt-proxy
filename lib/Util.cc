@@ -112,3 +112,32 @@ Json::String DeviceServerLib::Util::jsonEncode(Json::Value proto_value)
     json_string = serialize_string;
     return json_string;
 }
+
+uint32_t DeviceServerLib::Util::decodeRemainingLength(const char* byte)
+{
+    int i = 0;
+    uint32_t remaining_length = 0;
+    //解析剩余的长度
+    uint32_t multiplier = UINT8_LEN;
+
+    char data = *byte;
+
+    if(!data)
+    {
+        return 0;
+    }
+
+    do{
+        i++;
+        if(i > 4)
+        {
+            return 0;
+        }
+        remaining_length += (data & 127) * multiplier;
+        multiplier *= 128;
+        byte++;
+        data = *byte++;
+    }while((data & 128) != 0);
+
+    return remaining_length;
+}
