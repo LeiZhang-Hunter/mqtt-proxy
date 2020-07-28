@@ -76,7 +76,7 @@ bool DeviceServer::MQTTClientSession::publish(const DeviceServer::MQTTSubscribe&
     //建立一个发送缓冲
     std::vector<uint8_t> buffer;
     uint8_t fix_header = 0;
-    buffer.push_back(fix_header);
+//    buffer.push_back(MQTT_PUBLISH | );
     return true;
 }
 /**/
