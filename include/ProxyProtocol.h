@@ -90,6 +90,9 @@ public:
 
     //解析协议内容
     bool parse(muduo::net::Buffer* buffer);
+
+private:
+
 };
 }
 
