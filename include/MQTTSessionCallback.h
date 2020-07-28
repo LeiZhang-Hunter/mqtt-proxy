@@ -27,6 +27,7 @@ namespace Callback{
     typedef std::function<void()> MQTTProtocolOnDisConnect;
 
     typedef std::function<bool const(std::shared_ptr<MQTTProxy::MQTTProxyProtocol>&)> ProxyOnConnect;
+    typedef std::function<bool const(std::shared_ptr<MQTTProxy::MQTTProxyProtocol>&)> ProxyOnSubscribe;
 
     //代理转发
 

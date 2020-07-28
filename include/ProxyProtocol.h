@@ -103,7 +103,7 @@ public:
 
     void setOnDisConnectMessage(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb);
 
-    void setOnSubscribeMessage();
+    void setOnSubscribeMessage(const DeviceServer::Callback::ProxyOnSubscribe & cb);
 
     void setOnUnSubscribeMessage();
 
@@ -113,6 +113,7 @@ public:
 
 private:
     DeviceServer::Callback::ProxyOnConnect OnConnect;
+    DeviceServer::Callback::ProxyOnSubscribe OnSubscribe;
 
     std::shared_ptr<DeviceServerLib::MQTTResponse> response;
 };

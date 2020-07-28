@@ -89,9 +89,11 @@ void DeviceServer::MQTTServer::onServerStart(muduo::net::EventLoop* loop)
     std::shared_ptr<MQTTProxy::MQTTProxyClient> client(new MQTTProxy::MQTTProxyClient());
     client->handle = std::make_shared<MQTTProxy::ProxyProtocolHandle>();
 
-    //设置回调
+    //设置回调,这里是设备中心做出反应之后会触发这里的逻辑来确认是否要给出回应建立连接
     std::shared_ptr<DeviceServer::MQTTProxyHandle> proxy_server = std::make_shared<DeviceServer::MQTTProxyHandle>();
     client->handle->setOnConnectMessage(std::bind(&MQTTProxyHandle::OnConnectMessage, proxy_server, _1));
+    client->handle->setOnSubscribeMessage(std::bind(&MQTTProxyHandle::OnSubscribeMessage, proxy_server, _1));
+    //client->handle->setOnPublishMessage(std::bind(&MQTTProxyHandle::OnPublishMessage, proxy_server, _1));
 
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()] = client;
     muduo::net::InetAddress deviceServerListenAddr(9800);

@@ -84,14 +84,15 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         crc_string.push_back(*payload_len_byte);
         buffer->retrieve(UINT8_LEN);
         left_len -= UINT8_LEN;
+        std::string payload;
         if(payload_len)
         {
             if(payload_len > left_len)
             {
                 return false;
             }
-            std::string payload;
             payload.assign(buffer->peek(), payload_len);
+            protocol->Payload.insert(protocol->Payload.end(), payload.begin(), payload.end());
             buffer->retrieve(payload_len);
             left_len -= payload_len;
             crc_string.insert(crc_string.end(), payload.begin(), payload.end());
@@ -102,12 +103,17 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         left_len -= UINT16_LEN;
         uint16_t crc_check = buffer->peekInt16();
         uint16_t crc = MQTTContainer.Util.checkCRC16(crc_string.data(), crc_string.size());
+        buffer->retrieve(UINT16_LEN);
         if(crc != crc_check)
         {
             return false;
         }
 
         std::shared_ptr<DeviceServer::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
+        if(!session)
+        {
+            continue;
+        }
 
         switch (mqtt_type)
         {
@@ -115,10 +121,43 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
                 if(OnConnect(protocol))
                 {
                     response->sendConnectAck(session->getConn(), CONNACK_ACCEPTED, 0);
+                }else{
+                    response->sendConnectAck(session->getConn(), CONNACK_REFUSED_IDENTIFIER_REJECTED, 0);
                 }
                 break;
 
             case SUBSCRIBE_MESSAGE:
+                if(protocol->Payload.empty())
+                {
+                    break;
+                }
+                if(OnSubscribe(protocol))
+                {
+                    //解析payload
+                    Json::Value subscribe_data;
+                    if(MQTTContainer.Util.jsonDecode(payload, &subscribe_data))
+                    {
+                        if(!subscribe_data[SUBSCRIBE_TOPIC])
+                        {
+                            break;
+                        }
+
+                        if(subscribe_data[SUBSCRIBE_MESSAGE_ID] && subscribe_data[SUBSCRIBE_QOS_LEVEL])
+                        {
+                            DeviceServer::MQTTSubscribe subscribe;
+                            subscribe.messageId = subscribe_data[SUBSCRIBE_MESSAGE_ID].asUInt();
+                            subscribe.topic = subscribe_data[SUBSCRIBE_TOPIC].asString();
+                            subscribe.QosLevel = subscribe_data[SUBSCRIBE_QOS_LEVEL].asUInt();
+                            if(MQTTContainer.TopicTree->addSubscribe(subscribe, session))
+                            {
+                                response->sendSubscribeAck(session->getConn(), subscribe_data[SUBSCRIBE_MESSAGE_ID].asUInt(),
+                                                           subscribe_data[SUBSCRIBE_QOS_LEVEL].asUInt());
+                            }
+                        }
+                    }else{
+                        break;
+                    }
+                }
                 break;
 
             case UNSUBSCRIBE_MESSAGE:
@@ -148,9 +187,9 @@ void MQTTProxy::ProxyProtocolHandle::setOnDisConnectMessage(const DeviceServer::
 
 }
 
-void MQTTProxy::ProxyProtocolHandle::setOnSubscribeMessage()
+void MQTTProxy::ProxyProtocolHandle::setOnSubscribeMessage(const DeviceServer::Callback::ProxyOnSubscribe & cb)
 {
-
+    OnSubscribe = cb;
 }
 
 void MQTTProxy::ProxyProtocolHandle::setOnUnSubscribeMessage()

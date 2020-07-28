@@ -46,6 +46,10 @@ enum{
 #define CONNACK_REFUSED_PROTOCOL_VERSION 1
 #define CONNACK_REFUSED_IDENTIFIER_REJECTED 2
 
+#define SUBSCRIBE_TOPIC "topic"
+#define SUBSCRIBE_MESSAGE_ID "message_id"
+#define SUBSCRIBE_QOS_LEVEL "qos_level"
+
 //获取字节高位
 #define MSB(message_id) static_cast<uint8_t>((message_id & 0xFF00) >> 8)
 #define LSB(message_id) static_cast<uint8_t>(message_id & 0x00FF)

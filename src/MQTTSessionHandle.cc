@@ -56,7 +56,9 @@ bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::
     protocol.ClientId = session->getClientId();
     //加入订阅的主题
     Json::Value proto_builder;
-    proto_builder["topic"] = subscribe.topic;
+    proto_builder[SUBSCRIBE_TOPIC] = subscribe.topic;
+    proto_builder[SUBSCRIBE_MESSAGE_ID] = subscribe.messageId;
+    proto_builder[SUBSCRIBE_QOS_LEVEL] = subscribe.QosLevel;
     if(proto_builder.size() > 0)
     {
         Json::String encode_string = MQTTContainer.Util.jsonEncode(proto_builder);
@@ -85,7 +87,9 @@ bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback
     protocol.ClientId = session->getClientId();
     //加入取消订阅的主题
     Json::Value proto_builder;
-    proto_builder["topic"] = subscribe.topic;
+    proto_builder[SUBSCRIBE_TOPIC] = subscribe.topic;
+    proto_builder[SUBSCRIBE_MESSAGE_ID] = subscribe.messageId;
+    proto_builder[SUBSCRIBE_QOS_LEVEL] = subscribe.QosLevel;
     if(proto_builder.size() > 0)
     {
         Json::String encode_string = MQTTContainer.Util.jsonEncode(proto_builder);
@@ -116,6 +120,7 @@ void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQ
     Json::Value proto_builder;
     proto_builder["topic"] = subscribe.topic;
     proto_builder["message"] = message;
+    proto_builder["message_id"] = subscribe.messageId;
     if(proto_builder.size() > 0)
     {
         Json::String encode_string = MQTTContainer.Util.jsonEncode(proto_builder);
