@@ -68,4 +68,15 @@ void DeviceServer::MQTTClientSession::OnPublish(const DeviceServer::MQTTSubscrib
 {
     OnPublishCallback(shared_from_this(), subscribe, message);
 }
+/*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/
+
+//给会话推送消息
+bool DeviceServer::MQTTClientSession::publish(const DeviceServer::MQTTSubscribe& subscribe, const std::string& message)
+{
+    //建立一个发送缓冲
+    std::vector<uint8_t> buffer;
+    uint8_t fix_header = 0;
+    buffer.push_back(fix_header);
+    return true;
+}
 /**/

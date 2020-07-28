@@ -21,7 +21,7 @@ public:
 
     bool OnUnSubscribeMessage();
 
-    bool OnPublishMessage();
+    bool OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol);
 
     bool OnPublish();
 

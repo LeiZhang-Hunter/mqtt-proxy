@@ -107,13 +107,14 @@ public:
 
     void setOnUnSubscribeMessage();
 
-    void setOnPublishMessage();
+    void setOnPublishMessage(const DeviceServer::Callback::ProxyOnPublish & cb);
 
     void setOnPublish();
 
 private:
     DeviceServer::Callback::ProxyOnConnect OnConnect;
     DeviceServer::Callback::ProxyOnSubscribe OnSubscribe;
+    DeviceServer::Callback::ProxyOnPublish OnPublish;
 
     std::shared_ptr<DeviceServerLib::MQTTResponse> response;
 };

@@ -37,9 +37,14 @@ bool DeviceServer::MQTTProxyHandle::OnUnSubscribeMessage()
 
 }
 
-bool DeviceServer::MQTTProxyHandle::OnPublishMessage()
+bool DeviceServer::MQTTProxyHandle::OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
 {
+    if(protocol->MessageNo == 0)
+    {
+        return true;
+    }
 
+    return false;
 }
 
 bool DeviceServer::MQTTProxyHandle::OnPublish()

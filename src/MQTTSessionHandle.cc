@@ -118,9 +118,10 @@ void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQ
     //客户端id
     protocol.ClientId = session->getClientId();
     Json::Value proto_builder;
-    proto_builder["topic"] = subscribe.topic;
-    proto_builder["message"] = message;
-    proto_builder["message_id"] = subscribe.messageId;
+    proto_builder[SUBSCRIBE_TOPIC] = subscribe.topic;
+    proto_builder[PUBLISH_MSG] = message;
+    proto_builder[PUBLISH_MSG_ID] = subscribe.messageId;
+    proto_builder[PUBLISH_QOS_LEVEL] = subscribe.QosLevel;
     if(proto_builder.size() > 0)
     {
         Json::String encode_string = MQTTContainer.Util.jsonEncode(proto_builder);

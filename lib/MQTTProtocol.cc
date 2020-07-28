@@ -108,6 +108,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                         DeviceServer::MQTTSubscribe subscribe;
                         subscribe.messageId = message_id;
                         subscribe.topic = topic_name;
+                        subscribe.QosLevel = qos_level;
                         OnPublish(subscribe, payload);
                     }
 //                    if (qos_level == QUALITY_LEVEL_ONE) {

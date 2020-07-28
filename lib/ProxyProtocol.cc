@@ -23,6 +23,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
     const char *byte;
     const char *start;
     std::vector<uint8_t> crc_string;
+    uint8_t qos_level;
 
     while(left_len > 0)
     {
@@ -154,8 +155,6 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
                                                            subscribe_data[SUBSCRIBE_QOS_LEVEL].asUInt());
                             }
                         }
-                    }else{
-                        break;
                     }
                 }
                 break;
@@ -164,6 +163,34 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
                 break;
 
             case PUBLISH_MESSAGE:
+                if(protocol->Payload.empty())
+                {
+                    break;
+                }
+
+                if(OnPublish(protocol))
+                {
+                    Json::Value publish_data;
+
+                    if(MQTTContainer.Util.jsonDecode(payload, &publish_data))
+                    {
+                        qos_level = publish_data[PUBLISH_QOS_LEVEL].asUInt();
+                        //推送消息
+                        DeviceServer::MQTTSubscribe topic;
+                        topic.QosLevel = qos_level;
+                        topic.messageId = publish_data[PUBLISH_MSG_ID].asUInt();
+                        topic.topic = publish_data[SUBSCRIBE_TOPIC].asString();
+                        topic.sessionPtr = session;
+                        MQTTContainer.TopicTree->publish(topic, publish_data[PUBLISH_MSG].asString());
+                        if(qos_level == QUALITY_LEVEL_ONE)
+                        {
+                            response->sendPublishAck(session->getConn(), publish_data[PUBLISH_MSG_ID].asUInt());
+                        }else if(qos_level == QUALITY_LEVEL_TWO)
+                        {
+                            response->sendPublishRec(session->getConn(), publish_data[PUBLISH_MSG_ID].asUInt());
+                        }
+                    }
+                }
                 break;
 
             case DISCONNECT_MESSAGE:
@@ -197,9 +224,9 @@ void MQTTProxy::ProxyProtocolHandle::setOnUnSubscribeMessage()
 
 }
 
-void MQTTProxy::ProxyProtocolHandle::setOnPublishMessage()
+void MQTTProxy::ProxyProtocolHandle::setOnPublishMessage(const DeviceServer::Callback::ProxyOnPublish & cb)
 {
-
+    OnPublish = cb;
 }
 
 void MQTTProxy::ProxyProtocolHandle::setOnPublish()

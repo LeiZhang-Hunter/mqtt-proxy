@@ -36,6 +36,8 @@ public:
 
     SubscribeNode findSubscribe(const DeviceServer::MQTTSubscribe& topic);
 
+    void publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message);
+
 private:
     //订阅树
     TopicTreeMapType SubscribeTree;

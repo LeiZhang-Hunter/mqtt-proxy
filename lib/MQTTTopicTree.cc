@@ -251,3 +251,23 @@ DeviceServer::MQTTTopicTree::SubscribeNode DeviceServer::MQTTTopicTree::findSubs
     }
     return SubscribeNode();
 }
+
+void DeviceServer::MQTTTopicTree::publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message)
+{
+    SubscribeNode node = findSubscribe(topic);
+
+    if(node)
+    {
+        std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>>::iterator session_iterator;
+        if(node->SessionMap.size() > 0)
+        {
+            for(session_iterator = node->SessionMap.begin(); session_iterator != node->SessionMap.end(); session_iterator++)
+            {
+                if(session_iterator->second)
+                {
+                    session_iterator->second->publish(topic, message);
+                }
+            }
+        }
+    }
+}
