@@ -4,6 +4,11 @@
 
 #include "autoload.h"
 
+MQTTProxy::ProxyProtocolHandle::ProxyProtocolHandle()
+{
+    response = std::make_shared<DeviceServerLib::MQTTResponse>();
+}
+
 bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
 {
     size_t read_bytes = buffer->readableBytes();
@@ -21,6 +26,8 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
 
     while(left_len > 0)
     {
+        std::shared_ptr<MQTTProxy::MQTTProxyProtocol> protocol = std::make_shared<MQTTProxy::MQTTProxyProtocol>();
+
         crc_string.clear();
         //解析出协议的类型，这里协议的类型必须
         uint8_t protocol_type = buffer->peekInt8();
@@ -28,6 +35,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         read_len += UINT8_LEN;
         buffer->retrieve(UINT8_LEN);
         crc_string.push_back(protocol_type);
+        protocol->ProtocolType = protocol_type;
 
         //mqtt的消息类型
         uint8_t mqtt_type =  buffer->peekInt8();
@@ -35,12 +43,14 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         read_len += UINT8_LEN;
         crc_string.push_back(mqtt_type);
         buffer->retrieve(UINT8_LEN);
+        protocol->MessageType = mqtt_type;
 
         uint8_t message_no = buffer->peekInt8();
         buffer->retrieve(UINT8_LEN);
         left_len -= UINT8_LEN;
         read_len += UINT8_LEN;
         crc_string.push_back(message_no);
+        protocol->MessageNo = message_no;
 
         //解码出长度
         const char* client_id_len_byte = buffer->peek();
@@ -49,6 +59,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         buffer->retrieve(UINT8_LEN);
         left_len -= UINT8_LEN;
         read_len += UINT8_LEN;
+        protocol->ClientIdLength = client_id_len;
 
 
         //解析出client_id
@@ -64,6 +75,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
             left_len -= client_id_len;
             read_len += client_id_len;
             crc_string.insert(crc_string.end(), client_id.begin(), client_id.end());
+            protocol->ClientId = client_id;
         }
 
         //尝试解析载荷长度
@@ -94,11 +106,16 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         {
             return false;
         }
-        byte += UINT16_LEN;
+
+        std::shared_ptr<DeviceServer::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
 
         switch (mqtt_type)
         {
             case CONNECT_MESSAGE:
+                if(OnConnect(protocol))
+                {
+                    response->sendConnectAck(session->getConn(), CONNACK_ACCEPTED, 0);
+                }
                 break;
 
             case SUBSCRIBE_MESSAGE:
@@ -119,4 +136,34 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
     }
 
     return true;
+}
+
+void MQTTProxy::ProxyProtocolHandle::setOnConnectMessage(const DeviceServer::Callback::ProxyOnConnect& cb)
+{
+    OnConnect = cb;
+}
+
+void MQTTProxy::ProxyProtocolHandle::setOnDisConnectMessage(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb)
+{
+
+}
+
+void MQTTProxy::ProxyProtocolHandle::setOnSubscribeMessage()
+{
+
+}
+
+void MQTTProxy::ProxyProtocolHandle::setOnUnSubscribeMessage()
+{
+
+}
+
+void MQTTProxy::ProxyProtocolHandle::setOnPublishMessage()
+{
+
+}
+
+void MQTTProxy::ProxyProtocolHandle::setOnPublish()
+{
+
 }

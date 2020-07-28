@@ -31,7 +31,7 @@ set(SOURCE_SRC
     include/autoload.h
     src/MQTTServer.cc
     src/MQTTSessionHandle.cc
-    src/MQTTProxyClient.cc
+    src/MQTTProxyHandle.cc
     src/MQTTConnPool.cc
     )
 

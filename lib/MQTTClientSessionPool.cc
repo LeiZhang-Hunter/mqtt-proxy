@@ -10,6 +10,23 @@ DeviceServer::MQTTClientSessionPool::MQTTClientSessionPool()
 
 }
 
+std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSessionPool::findSession(const std::string& client_id)
+{
+    //上锁保护
+    muduo::MutexLockGuard guard(Lock_);
+
+    //初始化会话信息
+    ClientIdMapType::iterator session = ClientIdMap.find(client_id);
+
+    if(session != ClientIdMap.end())
+    {
+        //强制关闭
+        return ClientIdMap[client_id];
+    }
+
+    return nullptr;
+}
+
 std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSessionPool::bindSession(const std::string& client_id,
         const muduo::net::TcpConnectionPtr& conn) {
     if(client_id.empty())

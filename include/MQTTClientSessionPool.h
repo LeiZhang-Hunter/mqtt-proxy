@@ -18,6 +18,8 @@ public:
     std::shared_ptr<DeviceServer::MQTTClientSession> bindSession(const std::string& client_id,
             const muduo::net::TcpConnectionPtr& conn);
 
+    std::shared_ptr<DeviceServer::MQTTClientSession> findSession(const std::string& client_id);
+
     ~MQTTClientSessionPool();
 private:
 

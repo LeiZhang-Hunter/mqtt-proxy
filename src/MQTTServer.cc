@@ -87,6 +87,12 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
 void DeviceServer::MQTTServer::onServerStart(muduo::net::EventLoop* loop)
 {
     std::shared_ptr<MQTTProxy::MQTTProxyClient> client(new MQTTProxy::MQTTProxyClient());
+    client->handle = std::make_shared<MQTTProxy::ProxyProtocolHandle>();
+
+    //设置回调
+    std::shared_ptr<DeviceServer::MQTTProxyHandle> proxy_server = std::make_shared<DeviceServer::MQTTProxyHandle>();
+    client->handle->setOnConnectMessage(std::bind(&MQTTProxyHandle::OnConnectMessage, proxy_server, _1));
+
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()] = client;
     muduo::net::InetAddress deviceServerListenAddr(9800);
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setEventLoop(loop);

@@ -58,11 +58,14 @@ public:
     {
         std::cout<<"finish"<<std::endl;
     }
+
+    std::shared_ptr<MQTTProxy::ProxyProtocolHandle> handle;
 private:
     muduo::net::EventLoop* Loop;
     std::shared_ptr<muduo::net::TcpClient> Client;
     muduo::net::InetAddress ConnectAddr;
     muduo::net::TcpConnectionPtr Conn;
+
 };
 }
 

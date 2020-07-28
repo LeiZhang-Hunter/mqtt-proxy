@@ -5,6 +5,10 @@
 #ifndef DEVICE_SERVER_SESSIONCALLBACK_H
 #define DEVICE_SERVER_SESSIONCALLBACK_H
 
+namespace MQTTProxy{
+    class MQTTProxyProtocol;
+}
+
 namespace DeviceServer{
 
 class MQTTClientSession;
@@ -22,6 +26,9 @@ namespace Callback{
     typedef std::function<void(const DeviceServer::MQTTSubscribe&, const std::string& message)> MQTTProtocolOnPublish;
     typedef std::function<void()> MQTTProtocolOnDisConnect;
 
+    typedef std::function<bool const(std::shared_ptr<MQTTProxy::MQTTProxyProtocol>&)> ProxyOnConnect;
+
+    //代理转发
 
     /**
      * 业务层处理的回调

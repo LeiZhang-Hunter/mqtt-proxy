@@ -37,14 +37,20 @@
  * |          CRC校验
  * |-------------------------------
  */
+
+namespace DeviceServerLib
+{
+    class MQTTResponse;
+}
+
 namespace MQTTProxy
 {
 
 #define MQTT_PROXY 0
 
 //MQTT代理的协议
-typedef struct _MQTTProxyProtocol
-{
+class MQTTProxyProtocol{
+public:
     //协议类型0的话是mqtt代理的协议
     uint8_t ProtocolType = MQTT_PROXY;
     //消息类型
@@ -61,7 +67,7 @@ typedef struct _MQTTProxyProtocol
     std::vector<uint8_t> Payload;
     //CRC校验用来核对
     uint16_t MessageCrc;
-}MQTTProxyProtocol;
+};
 
 //协议的类型
 enum{
@@ -83,16 +89,32 @@ enum{
     RETURN_FAILED = 1
 };
 
-class ProxyProtocolHandle
+class MQTTClientSession;
+
+class ProxyProtocolHandle:public muduo::noncopyable
 {
 
 public:
-
+    ProxyProtocolHandle();
     //解析协议内容
     bool parse(muduo::net::Buffer* buffer);
 
-private:
+    void setOnConnectMessage(const DeviceServer::Callback::ProxyOnConnect& cb);
 
+    void setOnDisConnectMessage(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb);
+
+    void setOnSubscribeMessage();
+
+    void setOnUnSubscribeMessage();
+
+    void setOnPublishMessage();
+
+    void setOnPublish();
+
+private:
+    DeviceServer::Callback::ProxyOnConnect OnConnect;
+
+    std::shared_ptr<DeviceServerLib::MQTTResponse> response;
 };
 }
 

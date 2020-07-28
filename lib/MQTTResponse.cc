@@ -38,8 +38,14 @@ bool DeviceServerLib::MQTTResponse::sendPublishAck(const muduo::net::TcpConnecti
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
     publish_ack_buffer.push_back(LSB(message_id));
-    conn->send(publish_ack_buffer.data(), publish_ack_buffer.size());
-    return true;
+    if(conn)
+    {
+        conn->send(publish_ack_buffer.data(), publish_ack_buffer.size());
+        return true;
+    }else{
+        return false;
+    }
+
 }
 
 //发送publishrec的消息
@@ -52,8 +58,13 @@ bool DeviceServerLib::MQTTResponse::sendPublishRec(const muduo::net::TcpConnecti
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
     publish_ack_buffer.push_back(LSB(message_id));
-    conn->send(publish_ack_buffer.data(), publish_ack_buffer.size());
-    return true;
+    if(conn)
+    {
+        conn->send(publish_ack_buffer.data(), publish_ack_buffer.size());
+        return true;
+    }else{
+        return false;
+    }
 }
 
 //发送publishrel的消息

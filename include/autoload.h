@@ -27,13 +27,14 @@
 
 //business
 #include "Util.h"
-#include "ProxyProtocol.h"
 #include "MQTTType.h"
 #include "MQTTSessionCallback.h"
+#include "ProxyProtocol.h"
 #include "MQTTSubscribe.h"
 #include "MQTTResponse.h"
 #include "MQTTProtocol.h"
 #include "MQTTClientSession.h"
+#include "MQTTProxyHandle.h"
 #include "MQTTClientSessionPool.h"
 #include "MQTTTopicTree.h"
 #include "MQTTConnPool.h"
