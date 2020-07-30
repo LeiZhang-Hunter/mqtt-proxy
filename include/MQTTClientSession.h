@@ -229,7 +229,7 @@ public:
 
     void OnPublish(const DeviceServer::MQTTSubscribe& subscribe, const std::string& message);
 
-    bool publish(const DeviceServer::MQTTSubscribe& subscribe, const std::string& message);
+    bool publish(const MQTTMessage& message);
 
     ~MQTTClientSession()
     {

@@ -71,12 +71,33 @@ void DeviceServer::MQTTClientSession::OnPublish(const DeviceServer::MQTTSubscrib
 /*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/
 
 //给会话推送消息
-bool DeviceServer::MQTTClientSession::publish(const DeviceServer::MQTTSubscribe& subscribe, const std::string& message)
+bool DeviceServer::MQTTClientSession::publish(const MQTTMessage& message)
 {
     //建立一个发送缓冲
     std::vector<uint8_t> buffer;
-    uint8_t fix_header = 0;
+    buffer.push_back(MQTT_PUBLISH | ((message.Dup & 0x1) << 3) | (message.QosLevel << 1) | message.Retain);
+    //.
+    uint32_t remain_len = 2 + message.topic.size();
+    if(message.QosLevel > 0)
+    {
+        remain_len =  + 2;
+    }
+    std::vector<uint8_t> remaingBytes = MQTTContainer.Util.encodeRemainingLength(remain_len);
+    buffer.insert(buffer.end(), remaingBytes.begin(), remaingBytes.end());
+    buffer.push_back(MSB(message.topic.size()));
+    buffer.push_back(LSB(message.topic.size()));
+    buffer.insert(buffer.end(), message.topic.begin(), message.topic.end());
+    if(message.QosLevel > 0)
+    {
+        buffer.push_back(MSB(message.MessageId));
+        buffer.push_back(LSB(message.MessageId));
+    }
+    buffer.insert(buffer.end(), message.Payload.begin(), message.Payload.end());
 //    buffer.push_back(MQTT_PUBLISH | );
+    if(Conn)
+    {
+        Conn->send(buffer.data(), buffer.size());
+    }
     return true;
 }
 /**/

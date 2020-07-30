@@ -255,6 +255,7 @@ DeviceServer::MQTTTopicTree::SubscribeNode DeviceServer::MQTTTopicTree::findSubs
 void DeviceServer::MQTTTopicTree::publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message)
 {
     SubscribeNode node = findSubscribe(topic);
+    MQTTMessage data;
 
     if(node)
     {
@@ -265,7 +266,11 @@ void DeviceServer::MQTTTopicTree::publish(const DeviceServer::MQTTSubscribe &top
             {
                 if(session_iterator->second)
                 {
-                    session_iterator->second->publish(topic, message);
+                    data.QosLevel = topic.QosLevel;
+                    data.topic = topic.topic;
+                    data.Payload = message;
+                    data.MessageId = topic.messageId;
+                    session_iterator->second->publish(data);
                 }
             }
         }
