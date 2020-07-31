@@ -1,4 +1,4 @@
-PROJECT(device-server)
+PROJECT(mqtt-proxy)
 
 cmake_minimum_required(VERSION 3.4.1)
 
@@ -35,7 +35,7 @@ set(SOURCE_SRC
     src/MQTTConnPool.cc
     )
 
-add_executable(device-server ${SOURCE_SRC})
+add_executable(mqtt-proxy ${SOURCE_SRC})
 
 #定义连接文件
-target_link_libraries(device-server  muduo_net muduo_base pthread device-server-lib vendor)
+target_link_libraries(mqtt-proxy  muduo_net muduo_base pthread device-server-lib vendor)
