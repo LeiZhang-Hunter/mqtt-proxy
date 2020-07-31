@@ -135,6 +135,15 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 response.sendPingResp(conn);
                 break;
 
+            case MQTT_PUBREC_TYPE:
+                parseMessageId(buf);
+                response.sendPublishRel(conn, message_id);
+                break;
+
+            case MQTT_PUBCOMP_TYPE:
+                parseMessageId(buf);
+                break;
+
             default:
                 bufferRollback(buf);
                 return false;

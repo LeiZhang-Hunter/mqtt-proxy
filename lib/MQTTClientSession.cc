@@ -77,10 +77,10 @@ bool DeviceServer::MQTTClientSession::publish(const MQTTMessage& message)
     std::vector<uint8_t> buffer;
     buffer.push_back(MQTT_PUBLISH | ((message.Dup & 0x1) << 3) | (message.QosLevel << 1) | message.Retain);
     //.
-    uint32_t remain_len = 2 + message.topic.size();
+    uint32_t remain_len = 2 + message.topic.size() + message.Payload.length();
     if(message.QosLevel > 0)
     {
-        remain_len =  + 2;
+        remain_len +=  2;
     }
     std::vector<uint8_t> remaingBytes = MQTTContainer.Util.encodeRemainingLength(remain_len);
     buffer.insert(buffer.end(), remaingBytes.begin(), remaingBytes.end());
