@@ -71,15 +71,17 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 bool res = session->startSession();
                 if(!res)
                 {
+                    std::cout<<"conn->forceClose"<<std::endl;
                     conn->forceClose();
                 }
             }
         } else {
-            std::cout<<"error"<<std::endl;
+            std::cout<<"conn->forceClose"<<std::endl;
             conn->forceClose();
         }
     } else {
         //强制关闭
+        std::cout<<"conn->forceClose"<<std::endl;
         conn->forceClose();
     }
 }

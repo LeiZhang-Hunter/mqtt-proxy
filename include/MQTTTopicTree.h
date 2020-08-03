@@ -18,10 +18,14 @@ public:
     std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>> SonSubscribe;
 };
 //订阅树
-class MQTTTopicTree
+class MQTTTopicTree : public muduo::noncopyable
 {
 
 public:
+    MQTTTopicTree():lock()
+    {
+
+    }
     typedef std::map<std::string, std::shared_ptr<MQTTSubscribeTreeNode>> TopicTreeMapType;
     typedef std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode> SubscribeNode;
 
@@ -39,6 +43,7 @@ public:
     void publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message);
 
 private:
+    muduo::MutexLock lock;
     //订阅树
     TopicTreeMapType SubscribeTree;
 };

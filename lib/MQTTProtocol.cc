@@ -18,6 +18,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
 
         if(last_read_byte < UINT16_LEN)
         {
+            LOG_ERROR << "Last read byte less <UINT16_LEN>";
             bufferRollback(buf);
             return false;
         }
@@ -39,6 +40,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
             i++;
             if(i > 4)
             {
+                LOG_ERROR << "Remaining length more than <4>";
                 bufferRollback(buf);
                 return false;
             }
@@ -48,7 +50,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
 
         if(remaining_length < 0)
         {
-            std::cout<<"error3"<<std::endl;
+            LOG_ERROR << "Remaining length less than <0>";
             bufferRollback(buf);
             return  false;
         }
@@ -56,7 +58,8 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
         //说明这是一个不完整的包,不要继续读了
         if(last_read_byte < remaining_length +i + UINT8_LEN)
         {
-            std::cout<<"error4"<<std::endl;
+            LOG_ERROR << "Last Read Byte("<<last_read_byte<<") less than remaining_length +i + UINT8_LEN <"<<(remaining_length +i + UINT8_LEN)
+            <<">";
             bufferRollback(buf);
             return false;
         }
@@ -77,6 +80,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 if(!res)
                 {
                     bufferRollback(buf);
+                    LOG_ERROR << "parseOnConnect return false";
                     return false;
                 }
                 break;
@@ -85,6 +89,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 if(!parseOnSubscribe(buf)) {
                     //回滚字节
                     bufferRollback(buf);
+                    LOG_ERROR << "parseOnSubscribe return false";
                     return false;
                 }else{
                     //主题
@@ -117,6 +122,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
 //                        response.sendPublishRec(conn, message_id);
 //                    }
                 }else{
+                    LOG_ERROR << "parseOnPublish return false";
                     bufferRollback(buf);
                     return false;
                 }
@@ -135,10 +141,16 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 response.sendPingResp(conn);
                 break;
 
+            case MQTT_PUBACK_TYPE:
+                parseMessageId(buf);
+                break;
+
             case MQTT_PUBREC_TYPE:
                 parseMessageId(buf);
                 response.sendPublishRel(conn, message_id);
                 break;
+
+
 
             case MQTT_PUBCOMP_TYPE:
                 parseMessageId(buf);
@@ -163,10 +175,14 @@ bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     transaction_read_byte += UINT16_LEN;
 
     if(protocol_name_len < 4)
+    {
+        LOG_ERROR << "protocol name len less than 4";
         return  false;
+    }
 
     if(protocol_name_len > last_read_byte)
     {
+        LOG_ERROR << "protocol name ("<<protocol_name_len<<") len more than last_read_byte("<<last_read_byte<<")";
         return false;
     }
 
@@ -177,6 +193,7 @@ bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     transaction_read_byte += protocol_name_len;
     if(last_read_byte < 0)
     {
+        LOG_ERROR << "last read byte < 0";
         return false;
     }
 
@@ -199,8 +216,17 @@ bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     password_flag = (connect_flag & 0x40) >> 6;
     username_flag = (connect_flag & 0x80) >> 7;
 
-    if(will_qos > UINT16_LEN || will_qos < 0)
+    if(will_qos > UINT16_LEN)
+    {
+        LOG_ERROR << "will_qos("<<will_qos<<") > UINT16_LEN";
         return  false;
+    }
+
+    if(will_qos < 0)
+    {
+        LOG_ERROR << "will_qos < 0";
+        return false;
+    }
 
     //Keep Alive timer
     keep_live_time = buf->peekInt16();
@@ -211,6 +237,7 @@ bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     topic_name_len = buf->peekInt16();
     if(topic_name_len > last_read_byte)
     {
+        LOG_ERROR << "topic name len ("<<topic_name_len<<") len more than last_read_byte("<<last_read_byte<<")";
         return false;
     }
     buf->retrieve(UINT16_LEN);
@@ -267,6 +294,7 @@ bool DeviceServerLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
     payload_len = buf->peekInt16();
     if(payload_len > remaining_length - UINT16_LEN)
     {
+        LOG_ERROR << "payload_len("<<payload_len<<") > remaining_length - UINT16_LEN("<<(remaining_length - UINT16_LEN)<<")";
         return false;
     }
     buf->retrieve(UINT16_LEN);

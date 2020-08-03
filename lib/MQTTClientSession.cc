@@ -38,7 +38,11 @@ void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConn
 //关闭连接的时候触发
 void DeviceServer::MQTTClientSession::SessionOnClose(const muduo::net::TcpConnectionPtr &conn)
 {
-
+    std::cout<<"conn->forceClose"<<std::endl;
+    if(conn)
+    {
+        conn->forceClose();
+    }
 }
 
 /*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/

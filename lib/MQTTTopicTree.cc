@@ -26,6 +26,7 @@ bool DeviceServer::MQTTTopicTree::addSubscribe(const DeviceServer::MQTTSubscribe
     std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>>::iterator node_iterator;
 
     subscribe_key = subscribe_topic.substr(pos, find_pos - pos);
+    muduo::MutexLockGuard guard(lock);
     tree_iterator = SubscribeTree.find(subscribe_key);
     //没有发现节点
     if(tree_iterator == SubscribeTree.end())
@@ -254,6 +255,7 @@ DeviceServer::MQTTTopicTree::SubscribeNode DeviceServer::MQTTTopicTree::findSubs
 
 void DeviceServer::MQTTTopicTree::publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message)
 {
+    muduo::MutexLockGuard guard(lock);
     SubscribeNode node = findSubscribe(topic);
     MQTTMessage data;
 
