@@ -20,8 +20,9 @@ void DeviceServer::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& 
 //    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
 //              << conn->localAddress().toIpPort() << " is "
 //              << (conn->connected() ? "UP" : "DOWN");
+    std::cout<<"enter"<<std::endl;
     conn->setTcpNoDelay(true);
-    conn->setCloseCallback(std::bind(&MQTTServer::onClose, this, _1));
+    conn->setConnectionCallback(std::bind(&MQTTServer::onClose, this, _1));
     //绑定一个mqtt处理器
 }
 

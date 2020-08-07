@@ -79,8 +79,8 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 res = parseOnConnect(buf);
                 if(!res)
                 {
-                    bufferRollback(buf);
                     LOG_ERROR << "parseOnConnect return false";
+                    bufferRollback(buf);
                     return false;
                 }
                 break;

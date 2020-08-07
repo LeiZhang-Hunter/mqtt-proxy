@@ -18,7 +18,7 @@ bool DeviceServer::MQTTClientSession::startSession()
         //设置接收消息的事件
         Conn->setMessageCallback(std::bind(&MQTTClientSession::SessionOnMessage, shared_from_this(), _1, _2, _3));
         //设置关闭的回调事件
-        Conn->setCloseCallback(std::bind(&MQTTClientSession::SessionOnClose, shared_from_this(), _1));
+        Conn->setConnectionCallback(std::bind(&MQTTClientSession::SessionOnClose, shared_from_this(), _1));
         //标记为上线
         IsOnline = Online;
         return true;
@@ -39,10 +39,7 @@ void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConn
 void DeviceServer::MQTTClientSession::SessionOnClose(const muduo::net::TcpConnectionPtr &conn)
 {
     std::cout<<"conn->forceClose"<<std::endl;
-    if(conn)
-    {
-        conn->forceClose();
-    }
+    Conn = nullptr;
 }
 
 /*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/
