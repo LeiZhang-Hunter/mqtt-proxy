@@ -285,6 +285,10 @@ bool DeviceServerLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;
+    if(last_read_byte <= 0)
+    {
+        return false;
+    }
     transaction_read_byte += UINT16_LEN;
     if(!payload.empty())
     {
@@ -299,11 +303,21 @@ bool DeviceServerLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
     }
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;
+    if(last_read_byte <= 0)
+    {
+        LOG_ERROR << "last_read_byte <= 0";
+        return false;
+    }
     transaction_read_byte += UINT16_LEN;
 
     payload.append(buf->peek(), payload_len);
     buf->retrieve(payload_len);
     last_read_byte -= payload_len;
+    if(last_read_byte <= 0)
+    {
+        LOG_ERROR << "last_read_byte <= 0";
+        return false;
+    }
     transaction_read_byte += payload_len;
 
     uint8_t temp_qos_level = buf->peekInt8();
@@ -312,7 +326,6 @@ bool DeviceServerLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
     last_read_byte -= UINT8_LEN;
     transaction_read_byte += UINT8_LEN;
 
-    subscribe_map[payload] = subscribe_qos_level;
     return true;
 }
 

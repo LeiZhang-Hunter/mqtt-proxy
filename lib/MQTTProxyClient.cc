@@ -25,7 +25,7 @@ void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &con
     }
 }
 
-void MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol)
+bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol)
 {
     //导入协议类型
 
@@ -54,5 +54,8 @@ void MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtoco
     if(Conn)
     {
         Conn->send(buffer.data(), buffer.size());
+        return true;
+    }else{
+        return false;
     }
 }

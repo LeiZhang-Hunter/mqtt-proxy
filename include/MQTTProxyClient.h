@@ -52,7 +52,7 @@ public:
         return true;
     }
 
-    void sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol);
+    bool sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol);
 
     ~MQTTProxyClient()
     {

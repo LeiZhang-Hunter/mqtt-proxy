@@ -37,7 +37,14 @@ bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQ
     }
     protocol.MessageLength = protocol.Payload.size();
     //发送消息到设备中心
-    MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    bool res = MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    if(!res)
+    {
+        if(session->getConn())
+        {
+            response.sendConnectAck(session->getConn(), CONNACK_REFUSED_IDENTIFIER_REJECTED, 0);
+        }
+    }
     //response.sendConnectAck(session->getConn(), connectAck, CONNACK_ACCEPTED);
 }
 
@@ -69,7 +76,11 @@ bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::
     }
     protocol.MessageLength = protocol.Payload.size();
     //发送消息到设备中心
-    MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    bool res = MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    if(!res)
+    {
+        session->getConn()->forceClose();
+    }
 }
 
 //取消订阅事件
@@ -100,7 +111,10 @@ bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback
     }
     protocol.MessageLength = protocol.Payload.size();
     //发送消息到设备中心
-    MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    if(!MQTTContainer.getProxyClient()->sendProxyData(protocol))
+    {
+        session->getConn()->forceClose();
+    }
 }
 
 //收到相关主题的推送
@@ -132,7 +146,10 @@ void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQ
     }
     protocol.MessageLength = protocol.Payload.size();
     //发送消息到设备中心
-    MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    if(!MQTTContainer.getProxyClient()->sendProxyData(protocol))
+    {
+        session->getConn()->forceClose();
+    }
 }
 
 //关闭会话触发的事件
@@ -148,5 +165,8 @@ bool DeviceServer::MQTTSessionHandle::OnDisConnect(const DeviceServer::Callback:
     //客户端id
     protocol.ClientId = session->getClientId();
     //发送消息到设备中心
-    MQTTContainer.getProxyClient()->sendProxyData(protocol);
+    if(!MQTTContainer.getProxyClient()->sendProxyData(protocol))
+    {
+        session->getConn()->forceClose();
+    }
 }

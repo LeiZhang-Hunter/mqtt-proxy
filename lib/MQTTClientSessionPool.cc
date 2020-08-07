@@ -43,7 +43,10 @@ std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSession
     if(session != ClientIdMap.end())
     {
         //强制关闭
-        ClientIdMap[client_id]->getConn()->forceClose();
+        if(ClientIdMap[client_id]->getConn())
+        {
+            ClientIdMap[client_id]->getConn()->forceClose();
+        }
     }else{
         std::shared_ptr<DeviceServer::MQTTClientSession> new_session = std::make_shared<DeviceServer::MQTTClientSession>();
         ClientIdMap[client_id] = new_session;

@@ -13,6 +13,8 @@ public:
     bool sendConnectAck(const muduo::net::TcpConnectionPtr& conn, uint8_t ack, uint8_t result)
     {
         uint8_t message[4] = {MQTT_CONNECTACK, 2, ack, result};
+        if(!conn)
+            return false;
         conn->send(message, sizeof(message));
         return true;
     }

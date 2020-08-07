@@ -24,6 +24,8 @@ bool DeviceServerLib::MQTTResponse::sendSubscribeAck(const muduo::net::TcpConnec
     buffer.push_back(subscribe_qos_level);
 
     //响应
+    if(!conn)
+        return false;
     conn->send(buffer.data(), buffer.size());
     return true;
 }
