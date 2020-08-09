@@ -8,6 +8,7 @@ MQTTContainerGlobal MQTTContainer;
 int main()
 {
     //初始化mqtt全局容器
+    ::signal(SIGPIPE, SIG_IGN);
     MQTTContainer.globalInit();
     //LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     muduo::net::EventLoop loop;

@@ -7,6 +7,7 @@
 
 //c
 #include <fcntl.h>
+#include "signal.h"
 
 //c++
 #include <string>
