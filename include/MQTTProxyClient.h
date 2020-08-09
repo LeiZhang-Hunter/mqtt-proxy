@@ -56,7 +56,6 @@ public:
 
     ~MQTTProxyClient()
     {
-        std::cout<<"finish"<<std::endl;
     }
 
     std::shared_ptr<MQTTProxy::ProxyProtocolHandle> handle;

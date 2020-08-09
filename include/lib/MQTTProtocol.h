@@ -32,8 +32,6 @@ public:
 
     bool bufferRollback(muduo::net::Buffer *buf)
     {
-        std::cout<<"back:"<<transaction_read_byte<<std::endl;
-        std::cout<<"read_byte:"<<buf->readableBytes()<<std::endl;
         //buf->retrieve(-transaction_read_byte);
         return true;
     }

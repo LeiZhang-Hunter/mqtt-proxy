@@ -38,7 +38,6 @@ void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConn
 //关闭连接的时候触发
 void DeviceServer::MQTTClientSession::SessionOnClose(const muduo::net::TcpConnectionPtr &conn)
 {
-    std::cout<<"conn->forceClose"<<std::endl;
     Conn = nullptr;
 }
 

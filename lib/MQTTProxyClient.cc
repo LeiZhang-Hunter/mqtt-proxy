@@ -20,7 +20,6 @@ void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &con
 {
 
     if (!conn->connected()) {
-        std::cout<<"close"<<std::endl;
 
     }
 }
