@@ -9,21 +9,21 @@ namespace MQTTProxy{
     class MQTTProxyProtocol;
 }
 
-namespace DeviceServer{
+namespace MQTTProxy{
 
 class MQTTClientSession;
 class MQTTSubscribe;
 
 namespace Callback{
     //会话的智能指针
-    typedef std::shared_ptr<DeviceServer::MQTTClientSession> MQTTClientSessionPtr;
+    typedef std::shared_ptr<MQTTProxy::MQTTClientSession> MQTTClientSessionPtr;
     /**
      * 协议层处理的回调
      */
     typedef std::function<void()> MQTTProtocolOnConnect;
-    typedef std::function<void(const DeviceServer::MQTTSubscribe&)> MQTTProtocolOnSubscribe;
-    typedef std::function<void(const DeviceServer::MQTTSubscribe&)> MQTTProtocolOnUnSubscribe;
-    typedef std::function<void(const DeviceServer::MQTTSubscribe&, const std::string& message)> MQTTProtocolOnPublish;
+    typedef std::function<void(const MQTTProxy::MQTTSubscribe&)> MQTTProtocolOnSubscribe;
+    typedef std::function<void(const MQTTProxy::MQTTSubscribe&)> MQTTProtocolOnUnSubscribe;
+    typedef std::function<void(const MQTTProxy::MQTTSubscribe&, const std::string& message)> MQTTProtocolOnPublish;
     typedef std::function<void()> MQTTProtocolOnDisConnect;
 
     typedef std::function<bool const(std::shared_ptr<MQTTProxy::MQTTProxyProtocol>&)> ProxyOnConnect;
@@ -36,17 +36,17 @@ namespace Callback{
      * 业务层处理的回调
      */
     //会话建立连接的回调事件
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&)> SessionConnectCallback;
+    typedef std::function<void (const MQTTProxy::Callback::MQTTClientSessionPtr&)> SessionConnectCallback;
     //会话断开连接的回调事件
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&)> SessionDisConnectCallback;
+    typedef std::function<void (const MQTTProxy::Callback::MQTTClientSessionPtr&)> SessionDisConnectCallback;
     //订阅事件的回调函数
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&,
-            const DeviceServer::MQTTSubscribe&)> SessionSubscribeCallback;
+    typedef std::function<void (const MQTTProxy::Callback::MQTTClientSessionPtr&,
+            const MQTTProxy::MQTTSubscribe&)> SessionSubscribeCallback;
     //取消订阅的回调函数
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&,
-            const DeviceServer::MQTTSubscribe&)> SessionUnSubscribeCallback;
+    typedef std::function<void (const MQTTProxy::Callback::MQTTClientSessionPtr&,
+            const MQTTProxy::MQTTSubscribe&)> SessionUnSubscribeCallback;
     //推送事件的回调函数
-    typedef std::function<void (const DeviceServer::Callback::MQTTClientSessionPtr&, const DeviceServer::MQTTSubscribe&,
+    typedef std::function<void (const MQTTProxy::Callback::MQTTClientSessionPtr&, const MQTTProxy::MQTTSubscribe&,
             const std::string&)> SessionPublishCallback;
 }
 }

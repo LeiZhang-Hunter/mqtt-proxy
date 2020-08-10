@@ -5,7 +5,7 @@
 #include "autoload.h"
 
 //循环解析mqtt报文
-bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
+bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
 {
     //这个包可能并不完整我门首先要从不完整这个角度来分析，如果并不完整那么我们选择不解析
     dest_read_byte = buf->readableBytes();
@@ -94,7 +94,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                 }else{
                     //主题
                     if(OnSubscribe) {
-                        DeviceServer::MQTTSubscribe subscribe;
+                        MQTTProxy::MQTTSubscribe subscribe;
                         subscribe.messageId = message_id;
                         subscribe.topic = payload;
                         subscribe.QosLevel = subscribe_qos_level;
@@ -110,7 +110,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
                     //推送
                     if(OnPublish)
                     {
-                        DeviceServer::MQTTSubscribe subscribe;
+                        MQTTProxy::MQTTSubscribe subscribe;
                         subscribe.messageId = message_id;
                         subscribe.topic = topic_name;
                         subscribe.QosLevel = qos_level;
@@ -166,7 +166,7 @@ bool DeviceServerLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::
 }
 
 //解析mqtt连接协议
-bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
+bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
 {
     //variable header/可变的报头
     protocol_name_len = (buf->peekInt16());
@@ -280,7 +280,7 @@ bool DeviceServerLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
 }
 
 //解析订阅协议
-bool DeviceServerLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
+bool MQTTProxyLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);
@@ -330,7 +330,7 @@ bool DeviceServerLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
 }
 
 //解析发布
-bool DeviceServerLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
+bool MQTTProxyLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
 {
     if(!topic_name.empty())
     {
@@ -378,7 +378,7 @@ bool DeviceServerLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
 }
 
 //解析出message_id
-uint16_t DeviceServerLib::MQTTProtocol::parseMessageId(muduo::net::Buffer *buf)
+uint16_t MQTTProxyLib::MQTTProtocol::parseMessageId(muduo::net::Buffer *buf)
 {
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);

@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTCLIENTSESSION_H
 #define DEVICE_SERVER_MQTTCLIENTSESSION_H
 
-namespace DeviceServer
+namespace MQTTProxy
 {
 #define Online 1
 #define Offline 0
@@ -17,17 +17,19 @@ public:
     MQTTClientSession()
     :Lock_(), RefCount(0), IsOnline(Offline)
     {
-        protocol = std::make_shared<DeviceServerLib::MQTTProtocol>();
+        protocol = std::make_shared<MQTTProxyLib::MQTTProtocol>();
     }
 
     bool setConn(const muduo::net::TcpConnectionPtr& connection)
     {
+        muduo::MutexLockGuard guard(Lock_);
         Conn = connection;
         return true;
     }
 
     const muduo::net::TcpConnectionPtr& getConn()
     {
+        muduo::MutexLockGuard guard(Lock_);
         return Conn;
     }
 
@@ -157,35 +159,35 @@ public:
     }
 
     //设置连接的回调
-    bool setConnectCallback(const DeviceServer::Callback::SessionConnectCallback& cb)
+    bool setConnectCallback(const MQTTProxy::Callback::SessionConnectCallback& cb)
     {
         OnConnectCallback = cb;
         return true;
     }
 
     //设置断开连接的回调
-    bool setDisConnectCallback(const DeviceServer::Callback::SessionDisConnectCallback & cb)
+    bool setDisConnectCallback(const MQTTProxy::Callback::SessionDisConnectCallback & cb)
     {
         OnDisConnectCallback = cb;
         return true;
     }
 
     //设置订阅的回调
-    bool setSubscribeCallback(const DeviceServer::Callback::SessionSubscribeCallback& cb)
+    bool setSubscribeCallback(const MQTTProxy::Callback::SessionSubscribeCallback& cb)
     {
         OnSubscribeCallback = cb;
         return true;
     }
 
     //设置取消事件的回调
-    bool setUnSubscribeCallback(const DeviceServer::Callback::SessionUnSubscribeCallback& cb)
+    bool setUnSubscribeCallback(const MQTTProxy::Callback::SessionUnSubscribeCallback& cb)
     {
         OnUnSubscribeCallback = cb;
         return true;
     }
 
     //设置推送事件的回调
-    bool setPublishCallback(const DeviceServer::Callback::SessionPublishCallback& cb)
+    bool setPublishCallback(const MQTTProxy::Callback::SessionPublishCallback& cb)
     {
         OnPublishCallback = cb;
         return true;
@@ -223,11 +225,11 @@ public:
 
     void OnDisConnect();
 
-    void OnSubscribe(const DeviceServer::MQTTSubscribe& subscribe);
+    void OnSubscribe(const MQTTProxy::MQTTSubscribe& subscribe);
 
-    void OnUnSubscribe(const DeviceServer::MQTTSubscribe& subscribe);
+    void OnUnSubscribe(const MQTTProxy::MQTTSubscribe& subscribe);
 
-    void OnPublish(const DeviceServer::MQTTSubscribe& subscribe, const std::string& message);
+    void OnPublish(const MQTTProxy::MQTTSubscribe& subscribe, const std::string& message);
 
     bool publish(const MQTTMessage& message);
 
@@ -268,19 +270,19 @@ private:
     //客户端id
     std::string ClientId;
     //会话建立的回调
-    DeviceServer::Callback::SessionConnectCallback OnConnectCallback;
+    MQTTProxy::Callback::SessionConnectCallback OnConnectCallback;
     //会话断开连接的回调
-    DeviceServer::Callback::SessionConnectCallback OnDisConnectCallback;
+    MQTTProxy::Callback::SessionConnectCallback OnDisConnectCallback;
     //订阅的回调
-    DeviceServer::Callback::SessionSubscribeCallback OnSubscribeCallback;
+    MQTTProxy::Callback::SessionSubscribeCallback OnSubscribeCallback;
     //取消订阅的回调
-    DeviceServer::Callback::SessionUnSubscribeCallback OnUnSubscribeCallback;
+    MQTTProxy::Callback::SessionUnSubscribeCallback OnUnSubscribeCallback;
     //推送的时候的回调
-    DeviceServer::Callback::SessionPublishCallback OnPublishCallback;
+    MQTTProxy::Callback::SessionPublishCallback OnPublishCallback;
     //锁
     muduo::MutexLock Lock_;
     //每一个会话都应该有一个协议处理器
-    std::shared_ptr<DeviceServerLib::MQTTProtocol> protocol;
+    std::shared_ptr<MQTTProxyLib::MQTTProtocol> protocol;
     //由于存在特殊情况又接入了一个相同的client_id会话,这时候旧的client_id突然关闭会发生竞争条件，所以要加入一个计数器来防止被错误的销毁
     int RefCount GUARDED_BY(Lock_);
     //这个字段用来判断设备是否在线

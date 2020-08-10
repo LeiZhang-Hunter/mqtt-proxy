@@ -4,21 +4,21 @@
 
 #include "autoload.h"
 
-DeviceServer::MQTTConnPool::MQTTConnPool()
+MQTTProxy::MQTTConnPool::MQTTConnPool()
 :mutex_()
 {
 
 }
 
-bool DeviceServer::MQTTConnPool::registerConn(const muduo::net::TcpConnectionPtr& conn,
-        std::shared_ptr<DeviceServerLib::MQTTProtocol>& data)
+bool MQTTProxy::MQTTConnPool::registerConn(const muduo::net::TcpConnectionPtr& conn,
+        std::shared_ptr<MQTTProxyLib::MQTTProtocol>& data)
 {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnectPool[conn] = data;
     return true;
 }
 
-DeviceServer::MQTTConnPool::MQTTConnMapValue DeviceServer::MQTTConnPool::getConnMQTTInfo(const muduo::net::TcpConnectionPtr& conn)
+MQTTProxy::MQTTConnPool::MQTTConnMapValue MQTTProxy::MQTTConnPool::getConnMQTTInfo(const muduo::net::TcpConnectionPtr& conn)
 {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnMap::iterator dataIndex = MQTTConnectPool.find(conn);
@@ -31,7 +31,7 @@ DeviceServer::MQTTConnPool::MQTTConnMapValue DeviceServer::MQTTConnPool::getConn
     return MQTTConnectPool[conn];
 }
 
-bool DeviceServer::MQTTConnPool::deleteConn(const muduo::net::TcpConnectionPtr &conn)
+bool MQTTProxy::MQTTConnPool::deleteConn(const muduo::net::TcpConnectionPtr &conn)
 {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnMap::iterator dataIndex = MQTTConnectPool.find(conn);

@@ -6,7 +6,7 @@
 
 MQTTProxy::ProxyProtocolHandle::ProxyProtocolHandle()
 {
-    response = std::make_shared<DeviceServerLib::MQTTResponse>();
+    response = std::make_shared<MQTTProxyLib::MQTTResponse>();
 }
 
 bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
@@ -110,7 +110,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
             return false;
         }
 
-        std::shared_ptr<DeviceServer::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
+        std::shared_ptr<MQTTProxy::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
         if(!session)
         {
             continue;
@@ -145,7 +145,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
 
                         if(subscribe_data[SUBSCRIBE_MESSAGE_ID] && subscribe_data[SUBSCRIBE_QOS_LEVEL])
                         {
-                            DeviceServer::MQTTSubscribe subscribe;
+                            MQTTProxy::MQTTSubscribe subscribe;
                             subscribe.messageId = subscribe_data[SUBSCRIBE_MESSAGE_ID].asUInt();
                             subscribe.topic = subscribe_data[SUBSCRIBE_TOPIC].asString();
                             subscribe.QosLevel = subscribe_data[SUBSCRIBE_QOS_LEVEL].asUInt();
@@ -176,7 +176,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
                     {
                         qos_level = publish_data[PUBLISH_QOS_LEVEL].asUInt();
                         //推送消息
-                        DeviceServer::MQTTSubscribe topic;
+                        MQTTProxy::MQTTSubscribe topic;
                         topic.QosLevel = qos_level;
                         topic.messageId = publish_data[PUBLISH_MSG_ID].asUInt();
                         topic.topic = publish_data[SUBSCRIBE_TOPIC].asString();
@@ -204,17 +204,17 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
     return true;
 }
 
-void MQTTProxy::ProxyProtocolHandle::setOnConnectMessage(const DeviceServer::Callback::ProxyOnConnect& cb)
+void MQTTProxy::ProxyProtocolHandle::setOnConnectMessage(const MQTTProxy::Callback::ProxyOnConnect& cb)
 {
     OnConnect = cb;
 }
 
-void MQTTProxy::ProxyProtocolHandle::setOnDisConnectMessage(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb)
+void MQTTProxy::ProxyProtocolHandle::setOnDisConnectMessage(const MQTTProxy::Callback::MQTTProtocolOnDisConnect& cb)
 {
 
 }
 
-void MQTTProxy::ProxyProtocolHandle::setOnSubscribeMessage(const DeviceServer::Callback::ProxyOnSubscribe & cb)
+void MQTTProxy::ProxyProtocolHandle::setOnSubscribeMessage(const MQTTProxy::Callback::ProxyOnSubscribe & cb)
 {
     OnSubscribe = cb;
 }
@@ -224,7 +224,7 @@ void MQTTProxy::ProxyProtocolHandle::setOnUnSubscribeMessage()
 
 }
 
-void MQTTProxy::ProxyProtocolHandle::setOnPublishMessage(const DeviceServer::Callback::ProxyOnPublish & cb)
+void MQTTProxy::ProxyProtocolHandle::setOnPublishMessage(const MQTTProxy::Callback::ProxyOnPublish & cb)
 {
     OnPublish = cb;
 }

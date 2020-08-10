@@ -4,12 +4,12 @@
 
 #include "autoload.h"
 
-DeviceServer::MQTTProxyHandle::MQTTProxyHandle()
+MQTTProxy::MQTTProxyHandle::MQTTProxyHandle()
 {
 
 }
 
-bool DeviceServer::MQTTProxyHandle::OnConnectMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
+bool MQTTProxy::MQTTProxyHandle::OnConnectMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
 {
     if(protocol->MessageNo == 0)
         return true;
@@ -17,12 +17,12 @@ bool DeviceServer::MQTTProxyHandle::OnConnectMessage(const std::shared_ptr<MQTTP
     return false;
 }
 
-bool DeviceServer::MQTTProxyHandle::OnDisConnectMessage()
+bool MQTTProxy::MQTTProxyHandle::OnDisConnectMessage()
 {
-
+    return true;
 }
 
-bool DeviceServer::MQTTProxyHandle::OnSubscribeMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
+bool MQTTProxy::MQTTProxyHandle::OnSubscribeMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
 {
     if(protocol->MessageNo == 0)
         return true;
@@ -32,12 +32,12 @@ bool DeviceServer::MQTTProxyHandle::OnSubscribeMessage(const std::shared_ptr<MQT
     return false;
 }
 
-bool DeviceServer::MQTTProxyHandle::OnUnSubscribeMessage()
+bool MQTTProxy::MQTTProxyHandle::OnUnSubscribeMessage()
 {
-
+    return true;
 }
 
-bool DeviceServer::MQTTProxyHandle::OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
+bool MQTTProxy::MQTTProxyHandle::OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
 {
     if(protocol->MessageNo == 0)
     {
@@ -47,12 +47,12 @@ bool DeviceServer::MQTTProxyHandle::OnPublishMessage(const std::shared_ptr<MQTTP
     return false;
 }
 
-bool DeviceServer::MQTTProxyHandle::OnPublish()
+bool MQTTProxy::MQTTProxyHandle::OnPublish()
 {
-
+    return true;
 }
 
-DeviceServer::MQTTProxyHandle::~MQTTProxyHandle()
+MQTTProxy::MQTTProxyHandle::~MQTTProxyHandle()
 {
 
 }

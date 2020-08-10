@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTPROXYHANDLE_H
 #define DEVICE_SERVER_MQTTPROXYHANDLE_H
 
-namespace DeviceServer
+namespace MQTTProxy
 {
 class MQTTProxyHandle
 {

@@ -5,7 +5,7 @@
 
 using namespace std::placeholders;
 
-bool DeviceServer::MQTTClientSession::startSession()
+bool MQTTProxy::MQTTClientSession::startSession()
 {
     std::weak_ptr<muduo::net::TcpConnection> weak_conn;
     if(weak_conn.expired()) {
@@ -29,41 +29,41 @@ bool DeviceServer::MQTTClientSession::startSession()
 }
 
 //收到消息的时候触发
-void DeviceServer::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer* buf,
+void MQTTProxy::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer* buf,
         muduo::Timestamp)
 {
     protocol->parse(buf, conn);
 }
 
 //关闭连接的时候触发
-void DeviceServer::MQTTClientSession::SessionOnClose(const muduo::net::TcpConnectionPtr &conn)
+void MQTTProxy::MQTTClientSession::SessionOnClose(const muduo::net::TcpConnectionPtr &conn)
 {
     Conn = nullptr;
 }
 
 /*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/
-void DeviceServer::MQTTClientSession::OnConnect()
+void MQTTProxy::MQTTClientSession::OnConnect()
 {
     OnConnectCallback(shared_from_this());
 }
 
-void DeviceServer::MQTTClientSession::OnDisConnect()
+void MQTTProxy::MQTTClientSession::OnDisConnect()
 {
     OnConnectCallback(shared_from_this());
 }
 
-void DeviceServer::MQTTClientSession::OnSubscribe(const DeviceServer::MQTTSubscribe &subscribe)
+void MQTTProxy::MQTTClientSession::OnSubscribe(const MQTTProxy::MQTTSubscribe &subscribe)
 {
     //加入订阅树
     OnSubscribeCallback(shared_from_this(), subscribe);
 }
 
-void DeviceServer::MQTTClientSession::OnUnSubscribe(const DeviceServer::MQTTSubscribe &subscribe)
+void MQTTProxy::MQTTClientSession::OnUnSubscribe(const MQTTProxy::MQTTSubscribe &subscribe)
 {
     OnUnSubscribeCallback(shared_from_this(), subscribe);
 }
 
-void DeviceServer::MQTTClientSession::OnPublish(const DeviceServer::MQTTSubscribe &subscribe,
+void MQTTProxy::MQTTClientSession::OnPublish(const MQTTProxy::MQTTSubscribe &subscribe,
         const std::string &message)
 {
     OnPublishCallback(shared_from_this(), subscribe, message);
@@ -71,7 +71,7 @@ void DeviceServer::MQTTClientSession::OnPublish(const DeviceServer::MQTTSubscrib
 /*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/
 
 //给会话推送消息
-bool DeviceServer::MQTTClientSession::publish(const MQTTMessage& message)
+bool MQTTProxy::MQTTClientSession::publish(const MQTTMessage& message)
 {
     //建立一个发送缓冲
     std::vector<uint8_t> buffer;

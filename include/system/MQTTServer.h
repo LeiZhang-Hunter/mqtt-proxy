@@ -7,7 +7,7 @@
 
 
 
-namespace DeviceServer
+namespace MQTTProxy
 {
 
 class MQTTServer

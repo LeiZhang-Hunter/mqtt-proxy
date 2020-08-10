@@ -3,7 +3,7 @@
 //
 #include "autoload.h"
 //连接建立
-bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session)
+bool MQTTProxy::MQTTSessionHandle::OnConnect(const MQTTProxy::Callback::MQTTClientSessionPtr&  session)
 {
     uint8_t connectAck = 0;
     if(session->getCleanSession() == 0)
@@ -46,11 +46,12 @@ bool DeviceServer::MQTTSessionHandle::OnConnect(const DeviceServer::Callback::MQ
         }
     }
     //response.sendConnectAck(session->getConn(), connectAck, CONNACK_ACCEPTED);
+    return true;
 }
 
 //订阅事件
-bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-        const DeviceServer::MQTTSubscribe& subscribe)
+bool MQTTProxy::MQTTSessionHandle::OnSubscribe(const MQTTProxy::Callback::MQTTClientSessionPtr&  session,
+        const MQTTProxy::MQTTSubscribe& subscribe)
 {
     MQTTProxy::MQTTProxyProtocol protocol;
     //连接的标志
@@ -81,11 +82,12 @@ bool DeviceServer::MQTTSessionHandle::OnSubscribe(const DeviceServer::Callback::
     {
         session->getConn()->forceClose();
     }
+    return true;
 }
 
 //取消订阅事件
-bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-        const DeviceServer::MQTTSubscribe& subscribe)
+bool MQTTProxy::MQTTSessionHandle::OnUnSubscribe(const MQTTProxy::Callback::MQTTClientSessionPtr&  session,
+        const MQTTProxy::MQTTSubscribe& subscribe)
 {
     MQTTProxy::MQTTProxyProtocol protocol;
     //连接的标志
@@ -115,11 +117,12 @@ bool DeviceServer::MQTTSessionHandle::OnUnSubscribe(const DeviceServer::Callback
     {
         session->getConn()->forceClose();
     }
+    return true;
 }
 
 //收到相关主题的推送
-void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQTTClientSessionPtr&  session,
-        const DeviceServer::MQTTSubscribe& subscribe, const std::string& message
+void MQTTProxy::MQTTSessionHandle::OnPublish(const MQTTProxy::Callback::MQTTClientSessionPtr&  session,
+        const MQTTProxy::MQTTSubscribe& subscribe, const std::string& message
 )
 {
     MQTTProxy::MQTTProxyProtocol protocol;
@@ -153,7 +156,7 @@ void DeviceServer::MQTTSessionHandle::OnPublish(const DeviceServer::Callback::MQ
 }
 
 //关闭会话触发的事件
-bool DeviceServer::MQTTSessionHandle::OnDisConnect(const DeviceServer::Callback::MQTTClientSessionPtr&  session)
+bool MQTTProxy::MQTTSessionHandle::OnDisConnect(const MQTTProxy::Callback::MQTTClientSessionPtr&  session)
 {
     MQTTProxy::MQTTProxyProtocol protocol;
     //连接的标志
@@ -167,6 +170,7 @@ bool DeviceServer::MQTTSessionHandle::OnDisConnect(const DeviceServer::Callback:
     //发送消息到设备中心
     if(!MQTTContainer.getProxyClient()->sendProxyData(protocol))
     {
-        session->getConn()->forceClose();
+
     }
+    return true;
 }

@@ -6,7 +6,7 @@
 
 using namespace std::placeholders;
 
-DeviceServer::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &listenAddr)
+MQTTProxy::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::net::InetAddress &listenAddr)
         : loop_(loop),
           server_(loop, listenAddr, "MQTTServer")
 {
@@ -15,7 +15,7 @@ DeviceServer::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::n
     server_.setThreadNum(4);
 }
 
-void DeviceServer::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
+void MQTTProxy::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
 {
 //    LOG_TRACE << conn->peerAddress().toIpPort() << " -> "
 //              << conn->localAddress().toIpPort() << " is "
@@ -25,11 +25,11 @@ void DeviceServer::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& 
     //绑定一个mqtt处理器
 }
 
-void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
+void MQTTProxy::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
         muduo::Timestamp time)
 {
-    std::shared_ptr<DeviceServer::MQTTClientSession> session;
-    DeviceServerLib::MQTTProtocol protocol = muduo::Singleton<DeviceServerLib::MQTTProtocol>::instance();
+    std::shared_ptr<MQTTProxy::MQTTClientSession> session;
+    MQTTProxyLib::MQTTProtocol protocol = muduo::Singleton<MQTTProxyLib::MQTTProtocol>::instance();
     if(protocol.parse(buf, conn))
     {
         if(protocol.getMsgType() == MQTT_CONNECT_TYPE)
@@ -41,7 +41,7 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
                 "->" <<  conn->localAddress().toIpPort();
                 conn->forceClose();
             }else{
-                std::shared_ptr<DeviceServer::MQTTSessionHandle> handle(new DeviceServer::MQTTSessionHandle);
+                std::shared_ptr<MQTTProxy::MQTTSessionHandle> handle(new MQTTProxy::MQTTSessionHandle);
                 //绑定会话信息
                 session->setRetain(protocol.getRetain());
                 session->setDupFlag(protocol.getDupFlag());
@@ -93,30 +93,30 @@ void DeviceServer::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &con
     }
 }
 
-void DeviceServer::MQTTServer::onServerStart(muduo::net::EventLoop* loop)
+void MQTTProxy::MQTTServer::onServerStart(muduo::net::EventLoop* loop)
 {
     std::shared_ptr<MQTTProxy::MQTTProxyClient> client(new MQTTProxy::MQTTProxyClient());
     client->handle = std::make_shared<MQTTProxy::ProxyProtocolHandle>();
 
     //设置回调,这里是设备中心做出反应之后会触发这里的逻辑来确认是否要给出回应建立连接
-    std::shared_ptr<DeviceServer::MQTTProxyHandle> proxy_server = std::make_shared<DeviceServer::MQTTProxyHandle>();
+    std::shared_ptr<MQTTProxy::MQTTProxyHandle> proxy_server = std::make_shared<MQTTProxy::MQTTProxyHandle>();
     client->handle->setOnConnectMessage(std::bind(&MQTTProxyHandle::OnConnectMessage, proxy_server, _1));
     client->handle->setOnSubscribeMessage(std::bind(&MQTTProxyHandle::OnSubscribeMessage, proxy_server, _1));
     client->handle->setOnPublishMessage(std::bind(&MQTTProxyHandle::OnPublishMessage, proxy_server, _1));
 
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()] = client;
-    muduo::net::InetAddress deviceServerListenAddr(9800);
+    muduo::net::InetAddress MQTTProxyListenAddr(9800);
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setEventLoop(loop);
-    MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setConnectAddr(deviceServerListenAddr);
+    MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setConnectAddr(MQTTProxyListenAddr);
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->start();
 }
 
-void DeviceServer::MQTTServer::start()
+void MQTTProxy::MQTTServer::start()
 {
     server_.setThreadInitCallback(std::bind(&MQTTServer::onServerStart, this, _1));
     server_.start();
 }
 
-void DeviceServer::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
+void MQTTProxy::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
 {
 }

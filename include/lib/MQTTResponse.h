@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTRESPONSE_H
 #define DEVICE_SERVER_MQTTRESPONSE_H
 
-namespace DeviceServerLib {
+namespace MQTTProxyLib {
 class MQTTResponse : public muduo::noncopyable
 {
 public:

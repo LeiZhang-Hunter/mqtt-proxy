@@ -27,6 +27,7 @@
 #include <muduo/net/TcpClient.h>
 
 //business
+#include "MQTTProxyConfig.h"
 #include "Util.h"
 #include "MQTTType.h"
 #include "MQTTMessage.h"

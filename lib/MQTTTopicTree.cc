@@ -4,8 +4,8 @@
 
 #include "autoload.h"
 
-bool DeviceServer::MQTTTopicTree::addSubscribe(const DeviceServer::MQTTSubscribe& topic,
-        const DeviceServer::Callback::MQTTClientSessionPtr& session)
+bool MQTTProxy::MQTTTopicTree::addSubscribe(const MQTTProxy::MQTTSubscribe& topic,
+        const MQTTProxy::Callback::MQTTClientSessionPtr& session)
 {
     std::vector<std::string> topic_key;
     std::string delimiter("/");
@@ -17,13 +17,13 @@ bool DeviceServer::MQTTTopicTree::addSubscribe(const DeviceServer::MQTTSubscribe
     std::string subscribe_key;
     TopicTreeMapType::iterator tree_iterator;
     //会话的迭代器
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>>::iterator session_iterator;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
     //根节点
     TopicTreeMapType &tree = SubscribeTree;
     //订阅树节点
-    std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode> node;
+    std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> node;
     //订阅树节点的迭代器
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>>::iterator node_iterator;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode>>::iterator node_iterator;
 
     subscribe_key = subscribe_topic.substr(pos, find_pos - pos);
     muduo::MutexLockGuard guard(lock);
@@ -31,7 +31,7 @@ bool DeviceServer::MQTTTopicTree::addSubscribe(const DeviceServer::MQTTSubscribe
     //没有发现节点
     if(tree_iterator == SubscribeTree.end())
     {
-        SubscribeTree[subscribe_key] = std::make_shared<DeviceServer::MQTTSubscribeTreeNode>();
+        SubscribeTree[subscribe_key] = std::make_shared<MQTTProxy::MQTTSubscribeTreeNode>();
         SubscribeTree[subscribe_key]->topic = subscribe_key;
 
         //只有一级 绑定成功就结束了
@@ -68,7 +68,7 @@ bool DeviceServer::MQTTTopicTree::addSubscribe(const DeviceServer::MQTTSubscribe
             node_iterator = node->SonSubscribe.find(subscribe_key);
             if(node_iterator == node->SonSubscribe.end())
             {
-                node->SonSubscribe[subscribe_key] = std::make_shared<DeviceServer::MQTTSubscribeTreeNode>();
+                node->SonSubscribe[subscribe_key] = std::make_shared<MQTTProxy::MQTTSubscribeTreeNode>();
                 node->SonSubscribe[subscribe_key]->topic = subscribe_key;
             }
 
@@ -99,8 +99,8 @@ bool DeviceServer::MQTTTopicTree::addSubscribe(const DeviceServer::MQTTSubscribe
 }
 
 //从订阅树中取消这个会话
-bool DeviceServer::MQTTTopicTree::unSubscribe(const DeviceServer::MQTTSubscribe& topic,
-        const DeviceServer::Callback::MQTTClientSessionPtr& session)
+bool MQTTProxy::MQTTTopicTree::unSubscribe(const MQTTProxy::MQTTSubscribe& topic,
+        const MQTTProxy::Callback::MQTTClientSessionPtr& session)
 {
     std::vector<std::string> topic_key;
     std::string delimiter("/");
@@ -112,13 +112,13 @@ bool DeviceServer::MQTTTopicTree::unSubscribe(const DeviceServer::MQTTSubscribe&
     std::string subscribe_key;
     TopicTreeMapType::iterator tree_iterator;
     //会话的迭代器
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>>::iterator session_iterator;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
     //根节点
     TopicTreeMapType &tree = SubscribeTree;
     //订阅树节点
-    std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode> node;
+    std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> node;
     //订阅树节点的迭代器
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>>::iterator node_iterator;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode>>::iterator node_iterator;
 
     subscribe_key = subscribe_topic.substr(pos, find_pos - pos);
     tree_iterator = SubscribeTree.find(subscribe_key);
@@ -184,7 +184,7 @@ bool DeviceServer::MQTTTopicTree::unSubscribe(const DeviceServer::MQTTSubscribe&
 }
 
 //发现订阅池下面的所有会话
-DeviceServer::MQTTTopicTree::SubscribeNode DeviceServer::MQTTTopicTree::findSubscribe(const DeviceServer::MQTTSubscribe& topic)
+MQTTProxy::MQTTTopicTree::SubscribeNode MQTTProxy::MQTTTopicTree::findSubscribe(const MQTTProxy::MQTTSubscribe& topic)
 {
     std::vector<std::string> topic_key;
     std::string delimiter("/");
@@ -196,14 +196,14 @@ DeviceServer::MQTTTopicTree::SubscribeNode DeviceServer::MQTTTopicTree::findSubs
     std::string subscribe_key;
     TopicTreeMapType::iterator tree_iterator;
     //会话的迭代器
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>>::iterator session_iterator;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
     //根节点
     TopicTreeMapType &tree = SubscribeTree;
     //订阅树节点
-    std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode> node;
+    std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> node;
     //订阅树节点的迭代器
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>>::iterator node_iterator;
-    std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode> result;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode>>::iterator node_iterator;
+    std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> result;
 
     subscribe_key = subscribe_topic.substr(pos, find_pos - pos);
     tree_iterator = SubscribeTree.find(subscribe_key);
@@ -253,7 +253,7 @@ DeviceServer::MQTTTopicTree::SubscribeNode DeviceServer::MQTTTopicTree::findSubs
     return SubscribeNode();
 }
 
-void DeviceServer::MQTTTopicTree::publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message)
+void MQTTProxy::MQTTTopicTree::publish(const MQTTProxy::MQTTSubscribe &topic, const std::string& message)
 {
     muduo::MutexLockGuard guard(lock);
     SubscribeNode node = findSubscribe(topic);
@@ -261,7 +261,7 @@ void DeviceServer::MQTTTopicTree::publish(const DeviceServer::MQTTSubscribe &top
 
     if(node)
     {
-        std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>>::iterator session_iterator;
+        std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
         if(node->SessionMap.size() > 0)
         {
             for(session_iterator = node->SessionMap.begin(); session_iterator != node->SessionMap.end(); session_iterator++)

@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_UTIL_H
 #define DEVICE_SERVER_UTIL_H
 #include "json/json.h"
-namespace DeviceServerLib {
+namespace MQTTProxyLib {
 
 class Util{
 public:

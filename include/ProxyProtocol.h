@@ -38,7 +38,7 @@
  * |-------------------------------
  */
 
-namespace DeviceServerLib
+namespace MQTTProxyLib
 {
     class MQTTResponse;
 }
@@ -99,24 +99,24 @@ public:
     //解析协议内容
     bool parse(muduo::net::Buffer* buffer);
 
-    void setOnConnectMessage(const DeviceServer::Callback::ProxyOnConnect& cb);
+    void setOnConnectMessage(const MQTTProxy::Callback::ProxyOnConnect& cb);
 
-    void setOnDisConnectMessage(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb);
+    void setOnDisConnectMessage(const MQTTProxy::Callback::MQTTProtocolOnDisConnect& cb);
 
-    void setOnSubscribeMessage(const DeviceServer::Callback::ProxyOnSubscribe & cb);
+    void setOnSubscribeMessage(const MQTTProxy::Callback::ProxyOnSubscribe & cb);
 
     void setOnUnSubscribeMessage();
 
-    void setOnPublishMessage(const DeviceServer::Callback::ProxyOnPublish & cb);
+    void setOnPublishMessage(const MQTTProxy::Callback::ProxyOnPublish & cb);
 
     void setOnPublish();
 
 private:
-    DeviceServer::Callback::ProxyOnConnect OnConnect;
-    DeviceServer::Callback::ProxyOnSubscribe OnSubscribe;
-    DeviceServer::Callback::ProxyOnPublish OnPublish;
+    MQTTProxy::Callback::ProxyOnConnect OnConnect;
+    MQTTProxy::Callback::ProxyOnSubscribe OnSubscribe;
+    MQTTProxy::Callback::ProxyOnPublish OnPublish;
 
-    std::shared_ptr<DeviceServerLib::MQTTResponse> response;
+    std::shared_ptr<MQTTProxyLib::MQTTResponse> response;
 };
 }
 

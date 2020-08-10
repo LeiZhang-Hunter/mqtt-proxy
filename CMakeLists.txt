@@ -24,7 +24,7 @@ add_library(vendor SHARED ${VENDOR_LIB})
 
 file(GLOB_RECURSE LIB_SRC ${PROJECT_SOURCE_DIR}/lib/*.cc)
 
-add_library(device-server-lib STATIC ${LIB_SRC})
+add_library(device-server-lib STATIC ${LIB_SRC} lib/MQTTProxyConfig.cc)
 
 set(SOURCE_SRC
     main.cc
@@ -33,7 +33,7 @@ set(SOURCE_SRC
     src/MQTTSessionHandle.cc
     src/MQTTProxyHandle.cc
     src/MQTTConnPool.cc
-    )
+        include/MQTTProxyConfig.h)
 
 add_executable(mqtt-proxy ${SOURCE_SRC})
 

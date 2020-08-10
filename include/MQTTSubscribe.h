@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTSUBSCRIBE_H
 #define DEVICE_SERVER_MQTTSUBSCRIBE_H
 
-namespace DeviceServer {
+namespace MQTTProxy {
 
 class MQTTClientSession;
 
@@ -15,7 +15,7 @@ public:
     uint16_t messageId = 0;
     std::string topic;
     uint8_t QosLevel;
-    DeviceServer::Callback::MQTTClientSessionPtr sessionPtr;
+    MQTTProxy::Callback::MQTTClientSessionPtr sessionPtr;
 };
 }
 #endif //DEVICE_SERVER_MQTTSUBSCRIBE_H

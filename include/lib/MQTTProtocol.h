@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTPROTOCOL_H
 #define DEVICE_SERVER_MQTTPROTOCOL_H
 
-namespace DeviceServerLib {
+namespace MQTTProxyLib {
 /**
  * 这个类主要是负责mqtt协议内容解析的
  */
@@ -62,35 +62,35 @@ public:
     }
 
     //设置连接的回调
-    bool setConnectCallback(const DeviceServer::Callback::MQTTProtocolOnConnect& cb)
+    bool setConnectCallback(const MQTTProxy::Callback::MQTTProtocolOnConnect& cb)
     {
         OnConnect = cb;
         return true;
     }
 
     //设置断开连接的回调
-    bool setDisConnectCallback(const DeviceServer::Callback::MQTTProtocolOnDisConnect& cb)
+    bool setDisConnectCallback(const MQTTProxy::Callback::MQTTProtocolOnDisConnect& cb)
     {
         OnDisConnect = cb;
         return true;
     }
 
     //设置订阅的回调
-    bool setSubscribeCallback(const DeviceServer::Callback::MQTTProtocolOnSubscribe cb)
+    bool setSubscribeCallback(const MQTTProxy::Callback::MQTTProtocolOnSubscribe cb)
     {
         OnSubscribe = cb;
         return true;
     }
 
     //设置取消事件的回调
-    bool setUnSubscribeCallback(const DeviceServer::Callback::MQTTProtocolOnUnSubscribe& cb)
+    bool setUnSubscribeCallback(const MQTTProxy::Callback::MQTTProtocolOnUnSubscribe& cb)
     {
         OnUnSubscribe = cb;
         return true;
     }
 
     //设置推送事件的回调
-    bool setPublishCallback(const DeviceServer::Callback::MQTTProtocolOnPublish& cb)
+    bool setPublishCallback(const MQTTProxy::Callback::MQTTProtocolOnPublish& cb)
     {
         OnPublish = cb;
         return true;
@@ -152,15 +152,15 @@ public:
     uint16_t parseMessageId(muduo::net::Buffer *buf);
 
     //会话建立的回调
-    DeviceServer::Callback::MQTTProtocolOnConnect OnConnect;
+    MQTTProxy::Callback::MQTTProtocolOnConnect OnConnect;
     //会话断开连接的回调
-    DeviceServer::Callback::MQTTProtocolOnDisConnect OnDisConnect;
+    MQTTProxy::Callback::MQTTProtocolOnDisConnect OnDisConnect;
     //订阅的回调
-    DeviceServer::Callback::MQTTProtocolOnSubscribe OnSubscribe;
+    MQTTProxy::Callback::MQTTProtocolOnSubscribe OnSubscribe;
     //取消订阅的回调
-    DeviceServer::Callback::MQTTProtocolOnUnSubscribe OnUnSubscribe;
+    MQTTProxy::Callback::MQTTProtocolOnUnSubscribe OnUnSubscribe;
     //推送的时候的回调
-    DeviceServer::Callback::MQTTProtocolOnPublish OnPublish;
+    MQTTProxy::Callback::MQTTProtocolOnPublish OnPublish;
 };
 }
 #endif //DEVICE_SERVER_MQTTPROTOCOL_H

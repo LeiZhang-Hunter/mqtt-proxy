@@ -4,7 +4,7 @@
 
 #include "autoload.h"
 
-std::vector<uint8_t> DeviceServerLib::Util::encodeRemainingLength(uint32_t remainingLength)
+std::vector<uint8_t> MQTTProxyLib::Util::encodeRemainingLength(uint32_t remainingLength)
 {
     int i=0;
     uint8_t digit;
@@ -33,7 +33,7 @@ std::vector<uint8_t> DeviceServerLib::Util::encodeRemainingLength(uint32_t remai
 }
 
 //CRC16的校验
-uint16_t DeviceServerLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
+uint16_t MQTTProxyLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
 {
     static uint8_t U8_CRCTableHi[] = {
             0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
@@ -91,7 +91,7 @@ uint16_t DeviceServerLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
 }
 
 //json解码
-bool DeviceServerLib::Util::jsonDecode(std::string strJsonMess,Json::Value* root)
+bool MQTTProxyLib::Util::jsonDecode(std::string strJsonMess,Json::Value* root)
 {
     Json::CharReaderBuilder readerBuilder;
     std::unique_ptr<Json::CharReader>  jsonReader(readerBuilder.newCharReader());
@@ -102,7 +102,7 @@ bool DeviceServerLib::Util::jsonDecode(std::string strJsonMess,Json::Value* root
 }
 
 //json编码
-Json::String DeviceServerLib::Util::jsonEncode(Json::Value proto_value)
+Json::String MQTTProxyLib::Util::jsonEncode(Json::Value proto_value)
 {
     Json::StreamWriterBuilder proto_writer;
     //默认不格式化
@@ -113,7 +113,7 @@ Json::String DeviceServerLib::Util::jsonEncode(Json::Value proto_value)
     return json_string;
 }
 
-uint32_t DeviceServerLib::Util::decodeRemainingLength(const char* byte)
+uint32_t MQTTProxyLib::Util::decodeRemainingLength(const char* byte)
 {
     int i = 0;
     uint32_t remaining_length = 0;

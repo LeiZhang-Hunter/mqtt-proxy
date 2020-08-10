@@ -4,13 +4,13 @@
 
 #include "autoload.h"
 
-DeviceServer::MQTTClientSessionPool::MQTTClientSessionPool()
+MQTTProxy::MQTTClientSessionPool::MQTTClientSessionPool()
 :Lock_()
 {
 
 }
 
-std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSessionPool::findSession(const std::string& client_id)
+std::shared_ptr<MQTTProxy::MQTTClientSession> MQTTProxy::MQTTClientSessionPool::findSession(const std::string& client_id)
 {
     //上锁保护
     muduo::MutexLockGuard guard(Lock_);
@@ -27,7 +27,7 @@ std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSession
     return nullptr;
 }
 
-std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSessionPool::bindSession(const std::string& client_id,
+std::shared_ptr<MQTTProxy::MQTTClientSession> MQTTProxy::MQTTClientSessionPool::bindSession(const std::string& client_id,
         const muduo::net::TcpConnectionPtr& conn) {
     if(client_id.empty())
     {
@@ -48,7 +48,7 @@ std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSession
             ClientIdMap[client_id]->getConn()->forceClose();
         }
     }else{
-        std::shared_ptr<DeviceServer::MQTTClientSession> new_session = std::make_shared<DeviceServer::MQTTClientSession>();
+        std::shared_ptr<MQTTProxy::MQTTClientSession> new_session = std::make_shared<MQTTProxy::MQTTClientSession>();
         ClientIdMap[client_id] = new_session;
     }
     ClientIdMap[client_id]->setConn(conn);
@@ -56,7 +56,7 @@ std::shared_ptr<DeviceServer::MQTTClientSession> DeviceServer::MQTTClientSession
     return ClientIdMap[client_id];
 }
 
-DeviceServer::MQTTClientSessionPool::~MQTTClientSessionPool()
+MQTTProxy::MQTTClientSessionPool::~MQTTClientSessionPool()
 {
 
 }

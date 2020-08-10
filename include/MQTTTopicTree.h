@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTTOPIC_H
 #define DEVICE_SERVER_MQTTTOPIC_H
 
-namespace DeviceServer
+namespace MQTTProxy
 {
 
 //订阅树上的叶子节点
@@ -14,8 +14,8 @@ class MQTTSubscribeTreeNode
 
 public:
     std::string topic;
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTClientSession>> SessionMap;
-    std::map<std::string, std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode>> SonSubscribe;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>> SessionMap;
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode>> SonSubscribe;
 };
 //订阅树
 class MQTTTopicTree : public muduo::noncopyable
@@ -27,20 +27,20 @@ public:
 
     }
     typedef std::map<std::string, std::shared_ptr<MQTTSubscribeTreeNode>> TopicTreeMapType;
-    typedef std::shared_ptr<DeviceServer::MQTTSubscribeTreeNode> SubscribeNode;
+    typedef std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> SubscribeNode;
 
     //加入订阅树
-    bool addSubscribe(const DeviceServer::MQTTSubscribe& topic,
-            const DeviceServer::Callback::MQTTClientSessionPtr& session);
+    bool addSubscribe(const MQTTProxy::MQTTSubscribe& topic,
+            const MQTTProxy::Callback::MQTTClientSessionPtr& session);
 
     //从订阅树中取消
-    bool unSubscribe(const DeviceServer::MQTTSubscribe& topic,
-                      const DeviceServer::Callback::MQTTClientSessionPtr& session);
+    bool unSubscribe(const MQTTProxy::MQTTSubscribe& topic,
+                      const MQTTProxy::Callback::MQTTClientSessionPtr& session);
 
 
-    SubscribeNode findSubscribe(const DeviceServer::MQTTSubscribe& topic);
+    SubscribeNode findSubscribe(const MQTTProxy::MQTTSubscribe& topic);
 
-    void publish(const DeviceServer::MQTTSubscribe &topic, const std::string& message);
+    void publish(const MQTTProxy::MQTTSubscribe &topic, const std::string& message);
 
 private:
     muduo::MutexLock lock;
