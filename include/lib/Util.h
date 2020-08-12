@@ -7,7 +7,7 @@
 #include "json/json.h"
 namespace MQTTProxyLib {
 
-class Util{
+class Util : public muduo::noncopyable{
 public:
 
     //字节编码

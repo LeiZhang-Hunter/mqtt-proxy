@@ -26,6 +26,10 @@ int main(int argc,char** argv)
         std::cout<<"please input config path"<<std::endl;
         exit(-1);
     }
+
+    MQTTProxy::MQTTProxyConfig config;
+    config.setPath(path);
+    config.loadConfig();
     //初始化mqtt全局容器
     ::signal(SIGPIPE, SIG_IGN);
     MQTTContainer.globalInit();

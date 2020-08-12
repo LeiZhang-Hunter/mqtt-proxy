@@ -12,7 +12,7 @@ class MQTTProxyConfig
 {
 
 public:
-    bool setPath(const std::string path)
+    bool setPath(const std::string& path)
     {
         ConfigPath = path;
         return true;

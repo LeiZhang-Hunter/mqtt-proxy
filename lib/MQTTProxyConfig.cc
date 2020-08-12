@@ -13,5 +13,16 @@ bool MQTTProxy::MQTTProxyConfig::loadConfig()
         exit(-1);
     }
 
+    int fileFd = open(ConfigPath.c_str(), O_RDWR);
 
+    if (!fileFd) {
+        std::cout<<"open log failed:"<<__FILE__<<";line:"<<__LINE__<<std::endl;
+        exit(-1);
+    }
+
+
+    std::string content;
+    char buf[BUFSIZ];
+
+    read(fileFd, buf, BUFSIZ);
 }
