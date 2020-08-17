@@ -42,7 +42,11 @@ bool MQTTProxy::MQTTSessionHandle::OnConnect(const MQTTProxy::Callback::MQTTClie
     {
         if(session->getConn())
         {
-            response.sendConnectAck(session->getConn(), CONNACK_REFUSED_IDENTIFIER_REJECTED, 0);
+            res = response.sendConnectAck(session->getConn(), CONNACK_REFUSED_IDENTIFIER_REJECTED, 0);
+
+            if (!res) {
+                session->getConn()->forceClose();
+            }
         }
     }
     //response.sendConnectAck(session->getConn(), connectAck, CONNACK_ACCEPTED);
