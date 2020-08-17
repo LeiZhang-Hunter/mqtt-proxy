@@ -8,7 +8,7 @@
 namespace MQTTProxy
 {
 
-class MQTTProxyConfig
+class MQTTProxyConfig : public muduo::noncopyable
 {
 
 public:
@@ -20,8 +20,11 @@ public:
 
     bool loadConfig();
 
+    std::string getConfig(const std::string& key);
+
 private:
     std::string ConfigPath;
+    Json::Value configValue;
 };
 }
 

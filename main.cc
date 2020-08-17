@@ -28,11 +28,13 @@ int main(int argc,char** argv)
     }
 
     MQTTProxy::MQTTProxyConfig config;
-    config.setPath(path);
-    config.loadConfig();
     //初始化mqtt全局容器
     ::signal(SIGPIPE, SIG_IGN);
     MQTTContainer.globalInit();
+    config.setPath(path);
+    config.loadConfig();
+    std::string test;
+    test = config.getConfig("config");
     //LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     muduo::net::EventLoop loop;
     muduo::net::InetAddress listenAddr(9500);

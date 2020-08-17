@@ -7,9 +7,9 @@
 
 //c
 #include <fcntl.h>
-#include "signal.h"
 
 //c++
+#include <csignal>
 #include <string>
 #include <functional>
 #include <iostream>
@@ -25,6 +25,9 @@
 #include <muduo/net/Buffer.h>
 #include <muduo/base/Logging.h>
 #include <muduo/net/TcpClient.h>
+
+//json-cpp
+#include <json/json.h>
 
 //business
 #include "MQTTProxyConfig.h"

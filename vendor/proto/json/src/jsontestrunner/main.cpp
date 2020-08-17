@@ -15,7 +15,6 @@
 
 #include <algorithm> // sort
 #include <cstdio>
-#include <json/json.h>
 #include <sstream>
 
 struct Options {

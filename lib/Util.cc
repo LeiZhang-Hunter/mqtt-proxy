@@ -91,7 +91,7 @@ uint16_t MQTTProxyLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
 }
 
 //json解码
-bool MQTTProxyLib::Util::jsonDecode(std::string strJsonMess,Json::Value* root)
+bool MQTTProxyLib::Util::jsonDecode(const std::string& strJsonMess,Json::Value* root)
 {
     Json::CharReaderBuilder readerBuilder;
     std::unique_ptr<Json::CharReader>  jsonReader(readerBuilder.newCharReader());
