@@ -1,0 +1,7 @@
+{
+  "proxy_ip": "0.0.0.0",
+  "proxy_port": 9500,
+  "thread_num": 8,
+  "notify_ip": "127.0.0.1",
+  "notify_port": 9800
+}

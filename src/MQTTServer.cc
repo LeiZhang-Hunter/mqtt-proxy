@@ -12,7 +12,18 @@ MQTTProxy::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::net:
 {
     server_.setConnectionCallback(std::bind(&MQTTServer::onConnection, this, _1));
     server_.setMessageCallback(std::bind(&MQTTServer::onMessage, this, _1, _2, _3));
-    server_.setThreadNum(4);
+    std::string thread_num = MQTTContainer.Config.getConfig("thread_num");
+    if (thread_num.empty()) {
+        std::cerr << "proxy thread_num must not be empty" << std::endl;
+        exit(-1);
+    }
+
+    int thread_number = atoi(thread_num.c_str());
+    if (thread_number <= 0) {
+        std::cerr << "The number of threads cannot be less than 0" << std::endl;
+        exit(-1);
+    }
+    server_.setThreadNum(thread_number);
 }
 
 void MQTTProxy::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
@@ -105,6 +116,22 @@ void MQTTProxy::MQTTServer::onServerStart(muduo::net::EventLoop* loop)
     client->handle->setOnPublishMessage(std::bind(&MQTTProxyHandle::OnPublishMessage, proxy_server, _1));
 
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()] = client;
+
+    std::string notify_ip;
+    std::string notify_port;
+    notify_ip = MQTTContainer.Config.getConfig("notify_ip");
+    if(notify_ip.empty())
+    {
+        std::cerr << "notify ip must not be empty" << std::endl;
+        exit(-1);
+    }
+    notify_port = MQTTContainer.Config.getConfig("notify_port");
+    if(notify_port.empty())
+    {
+        std::cerr << "notify port must not be empty" << std::endl;
+        exit(-1);
+    }
+
     muduo::net::InetAddress MQTTProxyListenAddr(9800);
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setEventLoop(loop);
     MQTTContainer.ProxyMap[muduo::CurrentThread::tid()]->setConnectAddr(MQTTProxyListenAddr);

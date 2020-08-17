@@ -32,6 +32,7 @@ public:
 
     muduo::MutexLock Mutex;
     MQTTProxyLib::Util Util;
+    MQTTProxy::MQTTProxyConfig Config;
     std::shared_ptr<MQTTProxy::MQTTClientSessionPool> SessionPool;
     std::shared_ptr<MQTTProxy::MQTTTopicTree> TopicTree;
     std::map<int, std::shared_ptr<MQTTProxy::MQTTProxyClient>> ProxyMap;

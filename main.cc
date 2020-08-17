@@ -27,17 +27,28 @@ int main(int argc,char** argv)
         exit(-1);
     }
 
-    MQTTProxy::MQTTProxyConfig config;
     //初始化mqtt全局容器
     ::signal(SIGPIPE, SIG_IGN);
     MQTTContainer.globalInit();
-    config.setPath(path);
-    config.loadConfig();
-    std::string test;
-    test = config.getConfig("config");
+    MQTTContainer.Config.setPath(path);
+    MQTTContainer.Config.loadConfig();
+    std::string proxy_ip;
+    std::string proxy_port;
+    proxy_ip = MQTTContainer.Config.getConfig("proxy_ip");
+    if(proxy_ip.empty())
+    {
+        std::cerr << "proxy ip must not be empty" << std::endl;
+        exit(-1);
+    }
+    proxy_port = MQTTContainer.Config.getConfig("proxy_port");
+    if(proxy_port.empty())
+    {
+        std::cerr << "proxy port must not be empty" << std::endl;
+        exit(-1);
+    }
     //LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     muduo::net::EventLoop loop;
-    muduo::net::InetAddress listenAddr(9500);
+    muduo::net::InetAddress listenAddr(proxy_ip, atoi(proxy_port.c_str()));
     MQTTProxy::MQTTServer server(&loop, listenAddr);
     server.start();
     loop.loop();

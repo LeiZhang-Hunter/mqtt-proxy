@@ -60,7 +60,7 @@ bool MQTTProxy::MQTTProxyConfig::loadConfig()
 //获取配置
 std::string MQTTProxy::MQTTProxyConfig::getConfig(const std::string& key)
 {
-    if (configValue.isMember(key)) {
+    if (!configValue.isMember(key)) {
         return "";
     } else {
         return configValue[key.c_str()].asString();
