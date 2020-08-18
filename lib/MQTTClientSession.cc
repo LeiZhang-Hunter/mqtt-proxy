@@ -19,6 +19,7 @@ bool MQTTProxy::MQTTClientSession::startSession()
         Conn->setMessageCallback(std::bind(&MQTTClientSession::SessionOnMessage, shared_from_this(), _1, _2, _3));
         //设置关闭的回调事件
         Conn->setConnectionCallback(std::bind(&MQTTClientSession::SessionOnClose, shared_from_this(), _1));
+        Conn->setContext("mqttSession");
         //标记为上线
         IsOnline = Online;
         return true;
