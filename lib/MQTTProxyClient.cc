@@ -14,6 +14,7 @@ void MQTTProxy::MQTTProxyClient::onMessage(const muduo::net::TcpConnectionPtr &c
 void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr &conn)
 {
     Conn = conn;
+    Conn->setContext("device-center");
 }
 
 void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &conn)

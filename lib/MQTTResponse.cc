@@ -74,7 +74,7 @@ bool MQTTProxyLib::MQTTResponse::sendPublishRel(const muduo::net::TcpConnectionP
 {
     Util util;
     std::vector<uint8_t> publish_ack_buffer;
-    publish_ack_buffer.push_back(MQTT_PUBREL);
+    publish_ack_buffer.push_back(MQTT_PUBREL | 0x02);
     std::vector<uint8_t> remain_length = MQTTContainer.Util.encodeRemainingLength(UINT16_LEN);
     publish_ack_buffer.insert(publish_ack_buffer.end(), remain_length.begin(), remain_length.end());
     publish_ack_buffer.push_back(MSB(message_id));
