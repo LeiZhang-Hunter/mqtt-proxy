@@ -115,7 +115,8 @@ private:
     MQTTProxy::Callback::ProxyOnConnect OnConnect;
     MQTTProxy::Callback::ProxyOnSubscribe OnSubscribe;
     MQTTProxy::Callback::ProxyOnPublish OnPublish;
-
+    //要等待的消息通知的字典，当设备中心反馈过来的时候可以知道是反馈的哪一条消息
+    std::map<uint32_t, MQTTProxy::MQTTProxyProtocol> waitMsgPool;
     std::shared_ptr<MQTTProxyLib::MQTTResponse> response;
 };
 }

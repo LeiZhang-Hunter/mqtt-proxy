@@ -64,6 +64,8 @@ private:
     std::shared_ptr<muduo::net::TcpClient> Client;
     muduo::net::InetAddress ConnectAddr;
     muduo::net::TcpConnectionPtr Conn;
+    //请求ID用来区分收到的请求
+    uint32_t RequestId;
 
 };
 }
