@@ -33,7 +33,7 @@ set(SOURCE_SRC
     src/MQTTSessionHandle.cc
     src/MQTTProxyHandle.cc
     src/MQTTConnPool.cc
-        include/MQTTProxyConfig.h)
+    include/MQTTProxyConfig.h)
 
 add_executable(mqtt-proxy ${SOURCE_SRC})
 
