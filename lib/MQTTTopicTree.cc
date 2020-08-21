@@ -253,6 +253,11 @@ MQTTProxy::MQTTTopicTree::SubscribeNode MQTTProxy::MQTTTopicTree::findSubscribe(
     return SubscribeNode();
 }
 
+void MQTTProxy::MQTTTopicTree::publishHook(const MQTTProxy::MQTTSubscribe &topic, const std::string& message) {
+
+}
+
+//修改publish的逻辑，直接修改为订阅树便利订阅树的事后直接对树节点上的会话进行发送
 void MQTTProxy::MQTTTopicTree::publish(const MQTTProxy::MQTTSubscribe &topic, const std::string& message)
 {
     muduo::MutexLockGuard guard(lock);
