@@ -272,7 +272,9 @@ void MQTTProxy::MQTTTopicTree::publish(const MQTTProxy::MQTTSubscribe &topic, co
                     data.topic = topic.topic;
                     data.Payload = message;
                     data.MessageId = topic.messageId;
-                    session_iterator->second->publish(data);
+                    //派发到对应线程
+                    session_iterator->second->getConn()->getLoop()->runInLoop(std::bind(&MQTTClientSession::publish,
+                                                                                    session_iterator->second, data));
                 }
             }
         }
