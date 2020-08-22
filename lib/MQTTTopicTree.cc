@@ -272,7 +272,7 @@ void MQTTProxy::MQTTTopicTree::publishHook(SessionMapType sessionList, const MQT
                 //派发到对应线程
                 session_iterator->second->getConn()->getLoop()->runInLoop(std::bind(&MQTTClientSession::publish,
                                                                                     session_iterator->second, data));
-            }遍历整个订阅树 发现节点后 发送消息
+            }
         }
     }
 }
