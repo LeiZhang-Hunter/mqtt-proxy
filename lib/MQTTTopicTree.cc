@@ -253,35 +253,97 @@ MQTTProxy::MQTTTopicTree::SubscribeNode MQTTProxy::MQTTTopicTree::findSubscribe(
     return SubscribeNode();
 }
 
-void MQTTProxy::MQTTTopicTree::publishHook(const MQTTProxy::MQTTSubscribe &topic, const std::string& message) {
+void MQTTProxy::MQTTTopicTree::publishHook(SessionMapType sessionList, const MQTTProxy::MQTTSubscribe &topic,
+        const std::string& message) {
 
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
+    MQTTMessage data;
+
+    if(sessionList.size() > 0)
+    {
+        for(session_iterator = sessionList.begin(); session_iterator != sessionList.end(); session_iterator++)
+        {
+            if(session_iterator->second)
+            {
+                data.QosLevel = topic.QosLevel;
+                data.topic = topic.topic;
+                data.Payload = message;
+                data.MessageId = topic.messageId;
+                //派发到对应线程
+                session_iterator->second->getConn()->getLoop()->runInLoop(std::bind(&MQTTClientSession::publish,
+                                                                                    session_iterator->second, data));
+            }遍历整个订阅树 发现节点后 发送消息
+        }
+    }
 }
 
 //修改publish的逻辑，直接修改为订阅树便利订阅树的事后直接对树节点上的会话进行发送
 void MQTTProxy::MQTTTopicTree::publish(const MQTTProxy::MQTTSubscribe &topic, const std::string& message)
 {
     muduo::MutexLockGuard guard(lock);
-    SubscribeNode node = findSubscribe(topic);
-    MQTTMessage data;
+    std::vector<std::string> topic_key;
+    std::string delimiter("/");
+    size_t pos = 0;
+    std::string subscribe_topic = topic.topic;
+    int find_pos = subscribe_topic.find(delimiter, pos);
+    size_t len = subscribe_topic.length();
+    size_t delim_len = delimiter.length();
+    std::string subscribe_key;
+    TopicTreeMapType::iterator tree_iterator;
+    //会话的迭代器
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
+    //根节点
+    TopicTreeMapType &tree = SubscribeTree;
+    //订阅树节点
+    std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> node;
+    //订阅树节点的迭代器
+    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode>>::iterator node_iterator;
+    std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode> result;
 
-    if(node)
+    subscribe_key = subscribe_topic.substr(pos, find_pos - pos);
+    tree_iterator = SubscribeTree.find(subscribe_key);
+    //没有发现节点
+    if(tree_iterator == SubscribeTree.end())
     {
-        std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>::iterator session_iterator;
-        if(node->SessionMap.size() > 0)
+        return;
+    }
+
+    node = SubscribeTree[subscribe_key];
+
+    publishHook(node->SessionMap, topic, message);
+
+    //只有一级 绑定成功就结束了
+    if(find_pos < 0)
+    {
+        return;
+    }
+
+    pos = find_pos + delim_len;
+
+    //多个等级的处理
+    while (pos < len)
+    {
+        find_pos = subscribe_topic.find(delimiter, pos);
+
+        if (find_pos < 0)
         {
-            for(session_iterator = node->SessionMap.begin(); session_iterator != node->SessionMap.end(); session_iterator++)
+            subscribe_key = subscribe_topic.substr(pos, len - pos);
+            node_iterator = node->SonSubscribe.find(subscribe_key);
+            if(node_iterator == node->SonSubscribe.end())
             {
-                if(session_iterator->second)
-                {
-                    data.QosLevel = topic.QosLevel;
-                    data.topic = topic.topic;
-                    data.Payload = message;
-                    data.MessageId = topic.messageId;
-                    //派发到对应线程
-                    session_iterator->second->getConn()->getLoop()->runInLoop(std::bind(&MQTTClientSession::publish,
-                                                                                    session_iterator->second, data));
-                }
+                return;
             }
+            publishHook(node->SonSubscribe[subscribe_key]->SessionMap, topic, message);
         }
+        subscribe_key = subscribe_topic.substr(pos, find_pos - pos);
+        node_iterator = node->SonSubscribe.find(subscribe_key);
+        //找不到节点则初始化节点
+        if(node_iterator == node->SonSubscribe.end())
+        {
+            return;
+        }
+        node = node->SonSubscribe[subscribe_key];
+        //查找树节点是否存在如果不存在的话则初始化树节点
+        pos = find_pos + delim_len;
     }
 }

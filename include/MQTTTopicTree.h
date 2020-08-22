@@ -7,15 +7,15 @@
 
 namespace MQTTProxy
 {
+typedef std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>> SessionMapType;
 
 //订阅树上的叶子节点
 class MQTTSubscribeTreeNode
 {
 
 public:
-    typedef type name;
     std::string topic;
-    std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>> SessionMap;
+    SessionMapType SessionMap;
     std::map<std::string, std::shared_ptr<MQTTProxy::MQTTSubscribeTreeNode>> SonSubscribe;
 };
 //订阅树
@@ -42,7 +42,7 @@ public:
     SubscribeNode findSubscribe(const MQTTProxy::MQTTSubscribe& topic);
 
     //找到节点事后会回调这个函数地址
-    void publishHook(std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>>);
+    void publishHook(SessionMapType map, const MQTTProxy::MQTTSubscribe &topic, const std::string& message);
 
     void publish(const MQTTProxy::MQTTSubscribe &topic, const std::string& message);
 
@@ -51,7 +51,6 @@ private:
     //订阅树
     TopicTreeMapType SubscribeTree;
 
-//    std::function<>
 };
 }
 
