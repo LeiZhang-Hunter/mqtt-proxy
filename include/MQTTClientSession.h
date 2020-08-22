@@ -265,6 +265,8 @@ private:
     uint16_t KeepAliveTime;
     //版本版本
     uint32_t ProtocolVersion;
+    //消息ID
+    uint16_t MessageId = 0;
     //协议名称
     std::string ProtoName;
     //客户端id

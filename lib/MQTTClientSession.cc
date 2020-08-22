@@ -76,6 +76,7 @@ bool MQTTProxy::MQTTClientSession::publish(const MQTTMessage& message)
 {
     //建立一个发送缓冲
     std::vector<uint8_t> buffer;
+    MessageId++;
     buffer.push_back(MQTT_PUBLISH | ((message.Dup & 0x1) << 3) | (message.QosLevel << 1) | message.Retain);
     //.
     uint32_t remain_len = 2 + message.topic.size() + message.Payload.length();
@@ -90,8 +91,8 @@ bool MQTTProxy::MQTTClientSession::publish(const MQTTMessage& message)
     buffer.insert(buffer.end(), message.topic.begin(), message.topic.end());
     if(message.QosLevel > 0)
     {
-        buffer.push_back(MSB(message.MessageId));
-        buffer.push_back(LSB(message.MessageId));
+        buffer.push_back(MSB(MessageId));
+        buffer.push_back(LSB(MessageId));
     }
     buffer.insert(buffer.end(), message.Payload.begin(), message.Payload.end());
 //    buffer.push_back(MQTT_PUBLISH | );

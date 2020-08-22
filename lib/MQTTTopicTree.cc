@@ -270,8 +270,11 @@ void MQTTProxy::MQTTTopicTree::publishHook(SessionMapType sessionList, const MQT
                 data.Payload = message;
                 data.MessageId = topic.messageId;
                 //派发到对应线程
-                session_iterator->second->getConn()->getLoop()->runInLoop(std::bind(&MQTTClientSession::publish,
-                                                                                    session_iterator->second, data));
+                if (session_iterator->second->getConn()) {
+                    session_iterator->second->getConn()->getLoop()->runInLoop(std::bind(&MQTTClientSession::publish,
+                                                                                        session_iterator->second,
+                                                                                        data));
+                }
             }
         }
     }
