@@ -36,6 +36,7 @@ public:
     std::shared_ptr<MQTTProxy::MQTTClientSessionPool> SessionPool;
     std::shared_ptr<MQTTProxy::MQTTTopicTree> TopicTree;
     std::map<int, std::shared_ptr<MQTTProxy::MQTTProxyClient>> ProxyMap;
+    std::shared_ptr<muduo::CountDownLatch> finished;
     ~_MQTTContainerGlobal() = default;
 }MQTTContainerGlobal;
 

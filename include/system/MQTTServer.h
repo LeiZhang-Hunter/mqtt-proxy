@@ -32,6 +32,7 @@ private:
 
     muduo::net::EventLoop* loop_;
     muduo::net::TcpServer server_;
+    int thread_number;
 };
 }
 

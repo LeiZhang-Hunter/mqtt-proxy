@@ -71,6 +71,7 @@ public:
 
 //协议的类型
 enum{
+    //MQTT协议的消息类型
     CONNECT,
     CONNECT_MESSAGE,
     SUBSCRIBE,
@@ -80,7 +81,10 @@ enum{
     PUBLISH,
     PUBLISH_MESSAGE,
     DISCONNECT,
-    DISCONNECT_MESSAGE
+    DISCONNECT_MESSAGE,
+
+    //代理消息类型，这个消息在设备代理接入设备中心成功后会发往设备中心
+    PROXY_CONNECT,
 };
 
 //协议的类型

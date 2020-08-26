@@ -26,6 +26,7 @@
 #include <muduo/base/Logging.h>
 #include <muduo/net/TcpClient.h>
 #include <muduo/base/ThreadLocalSingleton.h>
+#include <muduo/base/CountDownLatch.h>
 
 //json-cpp
 #include <json/json.h>

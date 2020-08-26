@@ -15,6 +15,15 @@ void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr
 {
     Conn = conn;
     Conn->setContext("device-center");
+
+    //连接成功后发送握手协议
+    MQTTProxy::MQTTProxyProtocol protocol;
+    protocol.ProtocolType = MQTT_PROXY;
+    protocol.MessageType = PROXY_CONNECT;
+    protocol.MessageNo = RETURN_OK;
+    protocol.ClientIdLength = 0;
+    protocol.MessageLength = 0;
+    sendProxyData(protocol);
 }
 
 void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &conn)

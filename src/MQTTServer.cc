@@ -18,12 +18,13 @@ MQTTProxy::MQTTServer::MQTTServer(muduo::net::EventLoop *loop, const muduo::net:
         exit(-1);
     }
 
-    int thread_number = atoi(thread_num.c_str());
+    thread_number = atoi(thread_num.c_str());
     if (thread_number <= 0) {
         std::cerr << "The number of threads cannot be less than 0" << std::endl;
         exit(-1);
     }
     server_.setThreadNum(thread_number);
+    MQTTContainer.finished = std::make_shared<muduo::CountDownLatch>(thread_number);
 }
 
 void MQTTProxy::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr& conn)
@@ -142,6 +143,9 @@ void MQTTProxy::MQTTServer::start()
 {
     server_.setThreadInitCallback(std::bind(&MQTTServer::onServerStart, this, _1));
     server_.start();
+    //在开始循环之前要检查代理是否已经成功接入设备中心，设备中心接入成功之后才会继续执行
+    MQTTContainer.finished->wait();
+    std::cout<<"finished"<<std::endl;
 }
 
 void MQTTProxy::MQTTServer::onClose(const muduo::net::TcpConnectionPtr& conn)
