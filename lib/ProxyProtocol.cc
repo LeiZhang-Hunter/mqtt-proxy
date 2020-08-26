@@ -111,7 +111,7 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
         }
 
         std::shared_ptr<MQTTProxy::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
-        if(!session)
+        if(!session && mqtt_type != PROXY_CONNECT_MESSAGE)
         {
             continue;
         }
@@ -197,6 +197,10 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer* buffer)
                 break;
 
             case PUBLISH:
+                break;
+
+            case PROXY_CONNECT_MESSAGE:
+                MQTTContainer.finished->countDown();
                 break;
         }
     }
