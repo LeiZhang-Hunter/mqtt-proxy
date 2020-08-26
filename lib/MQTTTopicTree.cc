@@ -345,6 +345,7 @@ void MQTTProxy::MQTTTopicTree::publish(const MQTTProxy::MQTTSubscribe &topic, co
         {
             return;
         }
+        publishHook(node->SonSubscribe[subscribe_key]->SessionMap, topic, message);
         node = node->SonSubscribe[subscribe_key];
         //查找树节点是否存在如果不存在的话则初始化树节点
         pos = find_pos + delim_len;
