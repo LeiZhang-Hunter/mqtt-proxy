@@ -5,29 +5,30 @@
 #ifndef DEVICE_SERVER_MQTTCLIENTSESSIONPOOL_H
 #define DEVICE_SERVER_MQTTCLIENTSESSIONPOOL_H
 
-namespace MQTTProxy
-{
+#include "MQTTClientSession.h"
 
-class MQTTClientSessionPool : public muduo::noncopyable
-{
-public:
-    MQTTClientSessionPool();
+namespace MQTTProxy {
 
-    typedef std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>> ClientIdMapType;
+    class MQTTClientSessionPool : public muduo::noncopyable {
+    public:
+        MQTTClientSessionPool();
 
-    std::shared_ptr<MQTTProxy::MQTTClientSession> bindSession(const std::string& client_id,
-            const muduo::net::TcpConnectionPtr& conn);
+        typedef std::map<std::string, std::shared_ptr<MQTTProxy::MQTTClientSession>> ClientIdMapType;
 
-    std::shared_ptr<MQTTProxy::MQTTClientSession> findSession(const std::string& client_id);
+        std::shared_ptr<MQTTProxy::MQTTClientSession> bindSession(const std::string &client_id,
+                                                                  const muduo::net::TcpConnectionPtr &conn);
 
-    ~MQTTClientSessionPool();
-private:
+        std::shared_ptr<MQTTProxy::MQTTClientSession> findSession(const std::string &client_id);
 
-    muduo::MutexLock Lock_;
-    ClientIdMapType ClientIdMap;
-    //std::map<>
+        ~MQTTClientSessionPool();
 
-};
+    private:
+
+        muduo::MutexLock Lock_;
+        ClientIdMapType ClientIdMap;
+        //std::map<>
+
+    };
 
 }
 

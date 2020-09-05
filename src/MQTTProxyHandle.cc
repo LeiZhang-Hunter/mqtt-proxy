@@ -3,56 +3,47 @@
 //
 
 #include "autoload.h"
+#include "MQTTProxyHandle.h"
 
-MQTTProxy::MQTTProxyHandle::MQTTProxyHandle()
-{
+MQTTProxy::MQTTProxyHandle::MQTTProxyHandle() {
 
 }
 
-bool MQTTProxy::MQTTProxyHandle::OnConnectMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
-{
-    if(protocol->MessageNo == 0)
+bool MQTTProxy::MQTTProxyHandle::OnConnectMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol> &protocol) {
+    if (protocol->MessageNo == 0)
         return true;
 
     return false;
 }
 
-bool MQTTProxy::MQTTProxyHandle::OnDisConnectMessage()
-{
+bool MQTTProxy::MQTTProxyHandle::OnDisConnectMessage() {
     return true;
 }
 
-bool MQTTProxy::MQTTProxyHandle::OnSubscribeMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
-{
-    if(protocol->MessageNo == 0)
+bool MQTTProxy::MQTTProxyHandle::OnSubscribeMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol> &protocol) {
+    if (protocol->MessageNo == 0)
         return true;
-
 
 
     return false;
 }
 
-bool MQTTProxy::MQTTProxyHandle::OnUnSubscribeMessage()
-{
+bool MQTTProxy::MQTTProxyHandle::OnUnSubscribeMessage() {
     return true;
 }
 
-bool MQTTProxy::MQTTProxyHandle::OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol)
-{
-    if(protocol->MessageNo == 0)
-    {
+bool MQTTProxy::MQTTProxyHandle::OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol> &protocol) {
+    if (protocol->MessageNo == 0) {
         return true;
     }
 
     return false;
 }
 
-bool MQTTProxy::MQTTProxyHandle::OnPublish()
-{
+bool MQTTProxy::MQTTProxyHandle::OnPublish() {
     return true;
 }
 
-MQTTProxy::MQTTProxyHandle::~MQTTProxyHandle()
-{
+MQTTProxy::MQTTProxyHandle::~MQTTProxyHandle() {
 
 }

@@ -2,22 +2,24 @@
 // Created by zhanglei on 2020/6/23.
 //
 
+#include <MQTTSubscribe.h>
 #include "autoload.h"
+#include "MQTTProtocol.h"
+#include "MQTTSubscribe.h"
+#include "MQTTResponse.h"
 
 //循环解析mqtt报文
-bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn)
-{
+bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net::TcpConnectionPtr &conn) {
     //这个包可能并不完整我门首先要从不完整这个角度来分析，如果并不完整那么我们选择不解析
     dest_read_byte = buf->readableBytes();
     last_read_byte = dest_read_byte;
 
     //可读的字节数
-    while(last_read_byte > 0){
+    while (last_read_byte > 0) {
         //重置事务读取的字节数
         transaction_read_byte = 0;
 
-        if(last_read_byte < UINT16_LEN)
-        {
+        if (last_read_byte < UINT16_LEN) {
             LOG_ERROR << "Last read byte less <UINT16_LEN>";
             bufferRollback(buf);
             return false;
@@ -33,33 +35,31 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
         //解析剩余的长度
         uint32_t multiplier = UINT8_LEN;
         remaining_length = 0;
-        char i=0;
-        const char* byte = buf->peek();
+        char i = 0;
+        const char *byte = buf->peek();
         do {
             byte++;
             i++;
-            if(i > 4)
-            {
+            if (i > 4) {
                 LOG_ERROR << "Remaining length more than <4>";
                 bufferRollback(buf);
                 return false;
             }
             remaining_length += (*byte & 127) * multiplier;
             multiplier *= 128;
-        }while((*byte & 128) != 0);
+        } while ((*byte & 128) != 0);
 
-        if(remaining_length < 0)
-        {
+        if (remaining_length < 0) {
             LOG_ERROR << "Remaining length less than <0>";
             bufferRollback(buf);
-            return  false;
+            return false;
         }
 
         //说明这是一个不完整的包,不要继续读了
-        if(last_read_byte < remaining_length +i + UINT8_LEN)
-        {
-            LOG_ERROR << "Last Read Byte("<<last_read_byte<<") less than remaining_length +i + UINT8_LEN <"<<(remaining_length +i + UINT8_LEN)
-            <<">";
+        if (last_read_byte < remaining_length + i + UINT8_LEN) {
+            LOG_ERROR << "Last Read Byte(" << last_read_byte << ") less than remaining_length +i + UINT8_LEN <"
+                      << (remaining_length + i + UINT8_LEN)
+                      << ">";
             bufferRollback(buf);
             return false;
         }
@@ -77,8 +77,7 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
             //如果说消息类型是连接消息，那么不需要考虑粘包问题因为下一步我们是需要发送ack的
             case MQTT_CONNECT_TYPE:
                 res = parseOnConnect(buf);
-                if(!res)
-                {
+                if (!res) {
                     LOG_ERROR << "parseOnConnect return false";
                     bufferRollback(buf);
                     return false;
@@ -86,14 +85,14 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
                 break;
 
             case MQTT_SUBSCRIBE_TYPE:
-                if(!parseOnSubscribe(buf)) {
+                if (!parseOnSubscribe(buf)) {
                     //回滚字节
                     bufferRollback(buf);
                     LOG_ERROR << "parseOnSubscribe return false";
                     return false;
-                }else{
+                } else {
                     //主题
-                    if(OnSubscribe) {
+                    if (OnSubscribe) {
                         MQTTProxy::MQTTSubscribe subscribe;
                         subscribe.messageId = message_id;
                         subscribe.topic = payload;
@@ -104,12 +103,10 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
                 break;
 
             case MQTT_PUBLISH_TYPE:
-                if(parseOnPublish(buf))
-                {
+                if (parseOnPublish(buf)) {
 
                     //推送
-                    if(OnPublish)
-                    {
+                    if (OnPublish) {
                         MQTTProxy::MQTTSubscribe subscribe;
                         subscribe.messageId = message_id;
                         subscribe.topic = topic_name;
@@ -121,7 +118,7 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
 //                    } else if (qos_level == QUALITY_LEVEL_TWO) {
 //                        response.sendPublishRec(conn, message_id);
 //                    }
-                }else{
+                } else {
                     LOG_ERROR << "parseOnPublish return false";
                     bufferRollback(buf);
                     return false;
@@ -151,7 +148,6 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
                 break;
 
 
-
             case MQTT_PUBCOMP_TYPE:
                 parseMessageId(buf);
                 break;
@@ -166,23 +162,21 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
 }
 
 //解析mqtt连接协议
-bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
-{
+bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf) {
     //variable header/可变的报头
     protocol_name_len = (buf->peekInt16());
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;
     transaction_read_byte += UINT16_LEN;
 
-    if(protocol_name_len < 4)
-    {
+    if (protocol_name_len < 4) {
         LOG_ERROR << "protocol name len less than 4";
-        return  false;
+        return false;
     }
 
-    if(protocol_name_len > last_read_byte)
-    {
-        LOG_ERROR << "protocol name ("<<protocol_name_len<<") len more than last_read_byte("<<last_read_byte<<")";
+    if (protocol_name_len > last_read_byte) {
+        LOG_ERROR << "protocol name (" << protocol_name_len << ") len more than last_read_byte(" << last_read_byte
+                  << ")";
         return false;
     }
 
@@ -191,8 +185,7 @@ bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     buf->retrieve(protocol_name_len);
     last_read_byte -= protocol_name_len;
     transaction_read_byte += protocol_name_len;
-    if(last_read_byte < 0)
-    {
+    if (last_read_byte < 0) {
         LOG_ERROR << "last read byte < 0";
         return false;
     }
@@ -216,14 +209,12 @@ bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     password_flag = (connect_flag & 0x40) >> 6;
     username_flag = (connect_flag & 0x80) >> 7;
 
-    if(will_qos > UINT16_LEN)
-    {
-        LOG_ERROR << "will_qos("<<will_qos<<") > UINT16_LEN";
-        return  false;
+    if (will_qos > UINT16_LEN) {
+        LOG_ERROR << "will_qos(" << will_qos << ") > UINT16_LEN";
+        return false;
     }
 
-    if(will_qos < 0)
-    {
+    if (will_qos < 0) {
         LOG_ERROR << "will_qos < 0";
         return false;
     }
@@ -235,9 +226,8 @@ bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
     transaction_read_byte += UINT16_LEN;
 
     topic_name_len = buf->peekInt16();
-    if(topic_name_len > last_read_byte)
-    {
-        LOG_ERROR << "topic name len ("<<topic_name_len<<") len more than last_read_byte("<<last_read_byte<<")";
+    if (topic_name_len > last_read_byte) {
+        LOG_ERROR << "topic name len (" << topic_name_len << ") len more than last_read_byte(" << last_read_byte << ")";
         return false;
     }
     buf->retrieve(UINT16_LEN);
@@ -246,12 +236,11 @@ bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
 
     client_id.assign(buf->peek(), topic_name_len);
     buf->retrieve(topic_name_len);
-    last_read_byte-=topic_name_len;
+    last_read_byte -= topic_name_len;
     transaction_read_byte += topic_name_len;
 
     //如果说要设置账号
-    if(username_flag)
-    {
+    if (username_flag) {
         username_length = buf->peekInt16();
         buf->retrieve(UINT16_LEN);
         last_read_byte -= UINT16_LEN;
@@ -259,13 +248,12 @@ bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
 
         username.assign(buf->peek(), username_length);
         buf->retrieve(username_length);
-        last_read_byte-=username_length;
+        last_read_byte -= username_length;
         transaction_read_byte += username_length;
     }
 
     //如果说要设置密码
-    if(password_flag)
-    {
+    if (password_flag) {
         password_length = buf->peekInt16();
         buf->retrieve(UINT16_LEN);
         last_read_byte -= UINT16_LEN;
@@ -273,38 +261,34 @@ bool MQTTProxyLib::MQTTProtocol::parseOnConnect(muduo::net::Buffer *buf)
 
         password.assign(buf->peek(), password_length);
         buf->retrieve(password_length);
-        last_read_byte-=password_length;
+        last_read_byte -= password_length;
         transaction_read_byte += password_length;
     }
     return true;
 }
 
 //解析订阅协议
-bool MQTTProxyLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
-{
+bool MQTTProxyLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf) {
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;
-    if(last_read_byte <= 0)
-    {
+    if (last_read_byte <= 0) {
         return false;
     }
     transaction_read_byte += UINT16_LEN;
-    if(!payload.empty())
-    {
+    if (!payload.empty()) {
         payload.clear();
     }
 
     payload_len = buf->peekInt16();
-    if(payload_len > remaining_length - UINT16_LEN)
-    {
-        LOG_ERROR << "payload_len("<<payload_len<<") > remaining_length - UINT16_LEN("<<(remaining_length - UINT16_LEN)<<")";
+    if (payload_len > remaining_length - UINT16_LEN) {
+        LOG_ERROR << "payload_len(" << payload_len << ") > remaining_length - UINT16_LEN("
+                  << (remaining_length - UINT16_LEN) << ")";
         return false;
     }
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;
-    if(last_read_byte <= 0)
-    {
+    if (last_read_byte <= 0) {
         LOG_ERROR << "last_read_byte <= 0";
         return false;
     }
@@ -313,8 +297,7 @@ bool MQTTProxyLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
     payload.append(buf->peek(), payload_len);
     buf->retrieve(payload_len);
     last_read_byte -= payload_len;
-    if(last_read_byte <= 0)
-    {
+    if (last_read_byte <= 0) {
         LOG_ERROR << "last_read_byte <= 0";
         return false;
     }
@@ -330,22 +313,18 @@ bool MQTTProxyLib::MQTTProtocol::parseOnSubscribe(muduo::net::Buffer *buf)
 }
 
 //解析发布
-bool MQTTProxyLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
-{
-    if(!topic_name.empty())
-    {
+bool MQTTProxyLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf) {
+    if (!topic_name.empty()) {
         topic_name.clear();
     }
 
-    if(!payload.empty())
-    {
+    if (!payload.empty()) {
         payload.clear();
     }
 
     //主题长度
     uint16_t topic_len = buf->peekInt16();
-    if(topic_len + UINT16_LEN > remaining_length)
-    {
+    if (topic_len + UINT16_LEN > remaining_length) {
         return false;
     }
     buf->retrieve(UINT16_LEN);
@@ -360,8 +339,7 @@ bool MQTTProxyLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
     //剩余长度 - topic标题长度所占的高低字节 - 主题长度
     payload_len = remaining_length - UINT16_LEN - topic_len;
 
-    if(qos_level != QUALITY_LEVEL_ZERO)
-    {
+    if (qos_level != QUALITY_LEVEL_ZERO) {
         message_id = buf->peekInt16();
         buf->retrieve(UINT16_LEN);
         payload_len -= UINT16_LEN;
@@ -378,8 +356,7 @@ bool MQTTProxyLib::MQTTProtocol::parseOnPublish(muduo::net::Buffer *buf)
 }
 
 //解析出message_id
-uint16_t MQTTProxyLib::MQTTProtocol::parseMessageId(muduo::net::Buffer *buf)
-{
+uint16_t MQTTProxyLib::MQTTProtocol::parseMessageId(muduo::net::Buffer *buf) {
     message_id = buf->peekInt16();
     buf->retrieve(UINT16_LEN);
     last_read_byte -= UINT16_LEN;

@@ -3,16 +3,16 @@
 //
 
 #include "autoload.h"
+#include "MQTTProxyClient.h"
+#include "MQTTContainerGlobal.h"
 
 void MQTTProxy::MQTTProxyClient::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
-        muduo::Timestamp receiveTime)
-{
+                                           muduo::Timestamp receiveTime) {
     //解析返回的协议数据如果说连接成功则给下端发送连接确认
     handle->parse(buf);
 }
 
-void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr &conn)
-{
+void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr &conn) {
     Conn = conn;
     Conn->setContext("device-center");
 
@@ -26,16 +26,14 @@ void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr
     sendProxyData(protocol);
 }
 
-void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &conn)
-{
+void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &conn) {
 
     if (!conn->connected()) {
 
     }
 }
 
-bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtocol& protocol)
-{
+bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtocol &protocol) {
     //防止不在一个线程中的错误
     Loop->assertInLoopThread();
     //导入协议类型
@@ -47,25 +45,24 @@ bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtoco
     //消息的错误码
     buffer.push_back(protocol.MessageNo);
     //客户端id的长度
-    std::vector<__uint8_t > encodeRemainingLength = MQTTContainer.Util.encodeRemainingLength(protocol.ClientIdLength);
+    std::vector<__uint8_t> encodeRemainingLength = MQTTContainer.Util.encodeRemainingLength(protocol.ClientIdLength);
     buffer.insert(buffer.end(), encodeRemainingLength.begin(), encodeRemainingLength.end());
     //客户端id的内容
     buffer.insert(buffer.end(), protocol.ClientId.begin(), protocol.ClientId.end());
     //载荷的长度
-    std::vector<__uint8_t > message_len = MQTTContainer.Util.encodeRemainingLength(protocol.MessageLength);
+    std::vector<__uint8_t> message_len = MQTTContainer.Util.encodeRemainingLength(protocol.MessageLength);
     buffer.insert(buffer.end(), message_len.begin(), message_len.end());
     //载荷的内容
     buffer.insert(buffer.end(), protocol.Payload.begin(), protocol.Payload.end());
     //CRC校验的具体信息
-    uint16_t crc16 =  MQTTContainer.Util.checkCRC16(buffer.data(), buffer.size());
+    uint16_t crc16 = MQTTContainer.Util.checkCRC16(buffer.data(), buffer.size());
     buffer.push_back(MSB(crc16));
     buffer.push_back(LSB(crc16));
     //发送buffer
-    if(Conn)
-    {
+    if (Conn) {
         Conn->send(buffer.data(), buffer.size());
         return true;
-    }else{
+    } else {
         return false;
     }
 }

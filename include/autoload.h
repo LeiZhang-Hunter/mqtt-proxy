@@ -13,7 +13,8 @@
 #include <string>
 #include <functional>
 #include <iostream>
-
+#include <unordered_set>
+#include <boost/circular_buffer.hpp>
 //muduo
 #include <muduo/base/Singleton.h>
 #include <muduo/base/noncopyable.h>
@@ -28,27 +29,30 @@
 #include <muduo/base/ThreadLocalSingleton.h>
 #include <muduo/base/CountDownLatch.h>
 
+
 //json-cpp
 #include <json/json.h>
 
-//business
-#include "MQTTProxyConfig.h"
-#include "Util.h"
 #include "MQTTType.h"
-#include "MQTTMessage.h"
-#include "MQTTSessionCallback.h"
-#include "ProxyProtocol.h"
-#include "MQTTSubscribe.h"
-#include "MQTTResponse.h"
-#include "MQTTProtocol.h"
-#include "MQTTClientSession.h"
-#include "MQTTProxyHandle.h"
-#include "MQTTClientSessionPool.h"
-#include "MQTTTopicTree.h"
-#include "MQTTConnPool.h"
-#include "MQTTContainerGlobal.h"
-#include "MQTTSessionHandle.h"
-#include "MQTTProxyClient.h"
-#include "MQTTServer.h"
+////business
+//#include "MQTTProxyConfig.h"
+//#include "Util.h"
+//#include "MQTTType.h"
+//#include "MQTTMessage.h"
+//#include "TimingCell.h"
+//#include "MQTTSessionCallback.h"
+//#include "ProxyProtocol.h"
+//#include "MQTTSubscribe.h"
+//#include "MQTTResponse.h"
+//#include "MQTTProtocol.h"
+//#include "MQTTClientSession.h"
+//#include "MQTTProxyHandle.h"
+//#include "MQTTClientSessionPool.h"
+//#include "MQTTTopicTree.h"
+//#include "MQTTConnPool.h"
+//#include "MQTTContainerGlobal.h"
+//#include "MQTTSessionHandle.h"
+//#include "MQTTProxyClient.h"
+//#include "MQTTServer.h"
 
 #endif //DEVICE_SERVER_AUTOLOAD_H

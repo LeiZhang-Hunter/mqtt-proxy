@@ -5,6 +5,11 @@
 #ifndef DEVICE_SERVER_MQTTCONTAINERGLOBAL_H
 #define DEVICE_SERVER_MQTTCONTAINERGLOBAL_H
 
+#include "MQTTProxyConfig.h"
+#include "Util.h"
+#include "MQTTClientSessionPool.h"
+#include "MQTTTopicTree.h"
+
 namespace MQTTProxy
 {
     class MQTTProxyClient;

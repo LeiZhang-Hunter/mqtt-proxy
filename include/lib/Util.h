@@ -5,6 +5,8 @@
 #ifndef DEVICE_SERVER_UTIL_H
 #define DEVICE_SERVER_UTIL_H
 #include "json/json.h"
+#include "MQTTProtocol.h"
+
 namespace MQTTProxyLib {
 
 class Util : public muduo::noncopyable{

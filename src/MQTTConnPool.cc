@@ -3,40 +3,36 @@
 //
 
 #include "autoload.h"
+#include "MQTTConnPool.h"
 
 MQTTProxy::MQTTConnPool::MQTTConnPool()
-:mutex_()
-{
+        : mutex_() {
 
 }
 
-bool MQTTProxy::MQTTConnPool::registerConn(const muduo::net::TcpConnectionPtr& conn,
-        std::shared_ptr<MQTTProxyLib::MQTTProtocol>& data)
-{
+bool MQTTProxy::MQTTConnPool::registerConn(const muduo::net::TcpConnectionPtr &conn,
+                                           std::shared_ptr<MQTTProxyLib::MQTTProtocol> &data) {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnectPool[conn] = data;
     return true;
 }
 
-MQTTProxy::MQTTConnPool::MQTTConnMapValue MQTTProxy::MQTTConnPool::getConnMQTTInfo(const muduo::net::TcpConnectionPtr& conn)
-{
+MQTTProxy::MQTTConnPool::MQTTConnMapValue
+MQTTProxy::MQTTConnPool::getConnMQTTInfo(const muduo::net::TcpConnectionPtr &conn) {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnMap::iterator dataIndex = MQTTConnectPool.find(conn);
 
-    if(dataIndex == MQTTConnectPool.end())
-    {
+    if (dataIndex == MQTTConnectPool.end()) {
         return nullptr;
     }
 
     return MQTTConnectPool[conn];
 }
 
-bool MQTTProxy::MQTTConnPool::deleteConn(const muduo::net::TcpConnectionPtr &conn)
-{
+bool MQTTProxy::MQTTConnPool::deleteConn(const muduo::net::TcpConnectionPtr &conn) {
     muduo::MutexLockGuard guard(mutex_);
     MQTTConnMap::iterator dataIndex = MQTTConnectPool.find(conn);
-    if(dataIndex == MQTTConnectPool.end())
-    {
+    if (dataIndex == MQTTConnectPool.end()) {
         return false;
     }
 

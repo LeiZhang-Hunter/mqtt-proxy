@@ -5,7 +5,7 @@
 #ifndef DEVICE_SERVER_MQTTMESSAGE_H
 #define DEVICE_SERVER_MQTTMESSAGE_H
 
-typedef struct _MQTTMessage{
+typedef struct _MQTTMessage {
 
     uint8_t MQTTType = MQTT_PUBLISH_TYPE;
     uint8_t Dup = 0;
@@ -15,6 +15,6 @@ typedef struct _MQTTMessage{
     std::string topic;
     std::string Payload;
 
-}MQTTMessage;
+} MQTTMessage;
 
 #endif //DEVICE_SERVER_MQTTMESSAGE_H

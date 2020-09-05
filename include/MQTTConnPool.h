@@ -5,33 +5,34 @@
 #ifndef DEVICE_SERVER_MQTTCONNPOOL_H
 #define DEVICE_SERVER_MQTTCONNPOOL_H
 
-namespace MQTTProxy{
+#include "MQTTProtocol.h"
 
-class MQTTConnPool : public muduo::noncopyable
-{
+namespace MQTTProxy {
 
-public:
-    explicit MQTTConnPool();
+    class MQTTConnPool : public muduo::noncopyable {
 
-    typedef muduo::net::TcpConnectionPtr MQTTConnMapKey;
-    typedef std::shared_ptr<MQTTProxyLib::MQTTProtocol> MQTTConnMapValue;
-    typedef std::map<MQTTConnMapKey, MQTTConnMapValue> MQTTConnMap;
+    public:
+        explicit MQTTConnPool();
 
-    //注册连接
-    bool registerConn(const muduo::net::TcpConnectionPtr &conn, std::shared_ptr<MQTTProxyLib::MQTTProtocol>&);
+        typedef muduo::net::TcpConnectionPtr MQTTConnMapKey;
+        typedef std::shared_ptr<MQTTProxyLib::MQTTProtocol> MQTTConnMapValue;
+        typedef std::map<MQTTConnMapKey, MQTTConnMapValue> MQTTConnMap;
 
-    //获取连接信息
-    MQTTConnMapValue getConnMQTTInfo(const muduo::net::TcpConnectionPtr& conn);
+        //注册连接
+        bool registerConn(const muduo::net::TcpConnectionPtr &conn, std::shared_ptr<MQTTProxyLib::MQTTProtocol> &);
 
-    //删除连接
-    bool deleteConn(const muduo::net::TcpConnectionPtr &conn);
+        //获取连接信息
+        MQTTConnMapValue getConnMQTTInfo(const muduo::net::TcpConnectionPtr &conn);
 
-    ~MQTTConnPool() = default;
+        //删除连接
+        bool deleteConn(const muduo::net::TcpConnectionPtr &conn);
 
-private:
-    muduo::MutexLock mutex_;
-    MQTTConnMap MQTTConnectPool GUARDED_BY(mutex_);
-};
+        ~MQTTConnPool() = default;
+
+    private:
+        muduo::MutexLock mutex_;
+        MQTTConnMap MQTTConnectPool GUARDED_BY(mutex_);
+    };
 }
 
 #endif //DEVICE_SERVER_MQTTCONNPOOL_H

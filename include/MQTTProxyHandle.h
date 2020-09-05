@@ -5,30 +5,31 @@
 #ifndef DEVICE_SERVER_MQTTPROXYHANDLE_H
 #define DEVICE_SERVER_MQTTPROXYHANDLE_H
 
-namespace MQTTProxy
-{
-class MQTTProxyHandle
-{
+#include "ProxyProtocol.h"
 
-public:
-    MQTTProxyHandle();
+namespace MQTTProxy {
+    class MQTTProxyHandle {
 
-    bool OnConnectMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>&);
+    public:
+        MQTTProxyHandle();
 
-    bool OnDisConnectMessage();
+        bool OnConnectMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol> &);
 
-    bool OnSubscribeMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol);
+        bool OnDisConnectMessage();
 
-    bool OnUnSubscribeMessage();
+        bool OnSubscribeMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol> &protocol);
 
-    bool OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol>& protocol);
+        bool OnUnSubscribeMessage();
 
-    bool OnPublish();
+        bool OnPublishMessage(const std::shared_ptr<MQTTProxy::MQTTProxyProtocol> &protocol);
 
-    ~MQTTProxyHandle();
-private:
+        bool OnPublish();
 
-};
+        ~MQTTProxyHandle();
+
+    private:
+
+    };
 }
 
 #endif //DEVICE_SERVER_MQTTPROXYHANDLE_H

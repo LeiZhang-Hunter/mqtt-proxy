@@ -3,38 +3,35 @@
 //
 
 #include "autoload.h"
+#include "Util.h"
 
-std::vector<uint8_t> MQTTProxyLib::Util::encodeRemainingLength(uint32_t remainingLength)
-{
-    int i=0;
+std::vector<uint8_t> MQTTProxyLib::Util::encodeRemainingLength(uint32_t remainingLength) {
+    int i = 0;
     uint8_t digit;
-    std::vector<uint8_t > value;
+    std::vector<uint8_t> value;
 
-    do{
+    do {
         digit = remainingLength % 128;
-        remainingLength = remainingLength/128;
+        remainingLength = remainingLength / 128;
 
-        if(remainingLength > 0)
-        {
+        if (remainingLength > 0) {
             digit = digit | 0x80;
         }
 
         //两个字节最多4位了
-        if(i >= 4)
-        {
-            return std::vector<uint8_t >();
+        if (i >= 4) {
+            return std::vector<uint8_t>();
         }
 
         value.push_back(digit);
         i++;
-    }while (remainingLength > 0);
+    } while (remainingLength > 0);
 
     return value;
 }
 
 //CRC16的校验
-uint16_t MQTTProxyLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
-{
+uint16_t MQTTProxyLib::Util::checkCRC16(uint8_t *pMsg, uint16_t u16_DataLen) {
     static uint8_t U8_CRCTableHi[] = {
             0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
             0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0,
@@ -54,7 +51,7 @@ uint16_t MQTTProxyLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
             0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40, 0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41,
             0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81,
             0x40
-    } ;
+    };
 
 /* Table of CRC values for low-order byte */
 
@@ -77,44 +74,41 @@ uint16_t MQTTProxyLib::Util::checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen)
             0x48, 0x49, 0x89, 0x4B, 0x8B, 0x8A, 0x4A, 0x4E, 0x8E, 0x8F, 0x4F, 0x8D, 0x4D, 0x4C, 0x8C,
             0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83, 0x41, 0x81, 0x80,
             0x40
-    } ;
+    };
 
-    uint8_t uchCRCHi = 0xFF ;
-    uint8_t uchCRCLo = 0xFF ;
-    uint8_t uIndex ;
-    while ( u16_DataLen -- ){ //calcuate CRC
-        uIndex = uchCRCLo ^ *pMsg++ ;
-        uchCRCLo = uchCRCHi ^ U8_CRCTableHi[uIndex] ;
-        uchCRCHi = U8_CRCTableLo[uIndex] ;
+    uint8_t uchCRCHi = 0xFF;
+    uint8_t uchCRCLo = 0xFF;
+    uint8_t uIndex;
+    while (u16_DataLen--) { //calcuate CRC
+        uIndex = uchCRCLo ^ *pMsg++;
+        uchCRCLo = uchCRCHi ^ U8_CRCTableHi[uIndex];
+        uchCRCHi = U8_CRCTableLo[uIndex];
     }
-    return ( uchCRCLo << 8 | uchCRCHi) ;
+    return (uchCRCLo << 8 | uchCRCHi);
 }
 
 //json解码
-bool MQTTProxyLib::Util::jsonDecode(const std::string& strJsonMess,Json::Value* root)
-{
+bool MQTTProxyLib::Util::jsonDecode(const std::string &strJsonMess, Json::Value *root) {
     Json::CharReaderBuilder readerBuilder;
-    std::unique_ptr<Json::CharReader>  jsonReader(readerBuilder.newCharReader());
+    std::unique_ptr<Json::CharReader> jsonReader(readerBuilder.newCharReader());
     JSONCPP_STRING errs;
     Json::Value parseValue;
-    bool res = jsonReader->parse(strJsonMess.c_str(),strJsonMess.c_str()+strJsonMess.length(),root,&errs);
+    bool res = jsonReader->parse(strJsonMess.c_str(), strJsonMess.c_str() + strJsonMess.length(), root, &errs);
     return res;
 }
 
 //json编码
-Json::String MQTTProxyLib::Util::jsonEncode(Json::Value proto_value)
-{
+Json::String MQTTProxyLib::Util::jsonEncode(Json::Value proto_value) {
     Json::StreamWriterBuilder proto_writer;
     //默认不格式化
     proto_writer.settings_["indentation"] = "";
     std::string json_string;
-    Json::String serialize_string = writeString(proto_writer,proto_value);
+    Json::String serialize_string = writeString(proto_writer, proto_value);
     json_string = serialize_string;
     return json_string;
 }
 
-uint32_t MQTTProxyLib::Util::decodeRemainingLength(const char* byte)
-{
+uint32_t MQTTProxyLib::Util::decodeRemainingLength(const char *byte) {
     int i = 0;
     uint32_t remaining_length = 0;
     //解析剩余的长度
@@ -122,22 +116,20 @@ uint32_t MQTTProxyLib::Util::decodeRemainingLength(const char* byte)
 
     char data = *byte;
 
-    if(!data)
-    {
+    if (!data) {
         return 0;
     }
 
-    do{
+    do {
         i++;
-        if(i > 4)
-        {
+        if (i > 4) {
             return 0;
         }
         remaining_length += (data & 127) * multiplier;
         multiplier *= 128;
         byte++;
         data = *byte++;
-    }while((data & 128) != 0);
+    } while ((data & 128) != 0);
 
     return remaining_length;
 }
