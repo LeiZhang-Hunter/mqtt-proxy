@@ -1,9 +1,14 @@
 //
 // Created by zhanglei on 2020/7/12.
 //
+
 #include "autoload.h"
+#include <TimingCell.h>
+#include <TimingWheel.h>
+#include <ProxyProtocol.h>
 #include "MQTTClientSession.h"
 #include "MQTTContainerGlobal.h"
+#include "MQTTType.h"
 
 using namespace std::placeholders;
 
@@ -20,9 +25,13 @@ bool MQTTProxy::MQTTClientSession::startSession() {
         Conn->setMessageCallback(std::bind(&MQTTClientSession::SessionOnMessage, shared_from_this(), _1, _2, _3));
         //设置关闭的回调事件
         Conn->setConnectionCallback(std::bind(&MQTTClientSession::SessionOnClose, shared_from_this(), _1));
-        Conn->setContext("mqttSession");
         //标记为上线
         IsOnline = Online;
+        TimingCell::TimeCellPtr cell(new TimingCell(Conn));
+        cell->setMQTTProxyType(MQTT_PROXY);
+        muduo::ThreadLocalSingleton<TimingWheel>::instance().bindTimeCell(cell);
+        TimingCell::WeakTimeCellPtr weakTimeCell(cell);
+        Conn->setContext(weakTimeCell);
         return true;
     } else {
         LOG_WARN << getClientId() << "Conn(" << getClientId() << ") has been destroy";
@@ -33,6 +42,12 @@ bool MQTTProxy::MQTTClientSession::startSession() {
 //收到消息的时候触发
 void MQTTProxy::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
                                                     muduo::Timestamp) {
+    TimingCell::WeakTimeCellPtr weakCell(boost::any_cast<TimingCell::WeakTimeCellPtr>(Conn->getContext()));
+
+    TimingCell::TimeCellPtr cell(weakCell.lock());
+    if (cell) {
+        muduo::ThreadLocalSingleton<TimingWheel>::instance().bindTimeCell(cell);
+    }
     protocol->parse(buf, conn);
 }
 

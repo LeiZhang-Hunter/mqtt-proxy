@@ -46,6 +46,7 @@ namespace MQTTProxyLib {
 namespace MQTTProxy {
 
 #define MQTT_PROXY 0
+#define DEVICE_CENTER 1
 
 //MQTT代理的协议
     class MQTTProxyProtocol {

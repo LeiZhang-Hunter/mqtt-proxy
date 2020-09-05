@@ -41,8 +41,6 @@ void MQTTProxy::MQTTServer::onConnection(const muduo::net::TcpConnectionPtr &con
 //              << (conn->connected() ? "UP" : "DOWN");
     conn->setTcpNoDelay(true);
     conn->setConnectionCallback(std::bind(&MQTTServer::onClose, this, _1));
-
-
 }
 
 void MQTTProxy::MQTTServer::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
@@ -146,8 +144,7 @@ void MQTTProxy::MQTTServer::onServerStart(muduo::net::EventLoop *loop) {
         exit(-1);
     }
     muduo::ThreadLocalSingleton<TimingWheel>::instance().resizeWheelingSize(interval_time);
-    loop->runEvery((double) interval_time,
-                   std::bind(&TimingWheel::onTimer, muduo::ThreadLocalSingleton<TimingWheel>::pointer()));
+    loop->runEvery(1.0, std::bind(&TimingWheel::onTimer, muduo::ThreadLocalSingleton<TimingWheel>::pointer()));
 }
 
 void MQTTProxy::MQTTServer::start() {

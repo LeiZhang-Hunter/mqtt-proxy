@@ -5,17 +5,18 @@
 #ifndef MQTT_PROXY_TIMINGCELL_H
 #define MQTT_PROXY_TIMINGCELL_H
 namespace MQTTProxy {
-    class TimingCell;
-
-    typedef std::shared_ptr<TimingCell> TimeCellPtr;
-    typedef std::weak_ptr<TimingCell> WeakTimeCellPtr;
-
     class TimingCell {
+    public:
+        typedef std::shared_ptr<TimingCell> TimeCellPtr;
+        typedef std::weak_ptr<TimingCell> WeakTimeCellPtr;
         typedef std::weak_ptr<muduo::net::TcpConnection> WeakTcpConnectionPtr;
 
-    public:
-        explicit TimingCell(WeakTcpConnectionPtr &weakConn)
+        TimingCell(const WeakTcpConnectionPtr& weakConn)
                 : weakConn_(weakConn) {
+        }
+
+        void setMQTTProxyType(uint8_t param) {
+            type = param;
         }
 
         ~TimingCell() {
@@ -24,7 +25,7 @@ namespace MQTTProxy {
                 conn->shutdown();
             }
         }
-
+        uint8_t type;
         WeakTcpConnectionPtr weakConn_;
     };
 

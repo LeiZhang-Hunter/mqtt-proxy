@@ -5,16 +5,31 @@
 #include "autoload.h"
 #include "MQTTProxyClient.h"
 #include "MQTTContainerGlobal.h"
+#include "TimingWheel.h"
+
 
 void MQTTProxy::MQTTProxyClient::onMessage(const muduo::net::TcpConnectionPtr &conn, muduo::net::Buffer *buf,
                                            muduo::Timestamp receiveTime) {
     //解析返回的协议数据如果说连接成功则给下端发送连接确认
     handle->parse(buf);
+
+    TimingCell::WeakTimeCellPtr weakCell(boost::any_cast<TimingCell::WeakTimeCellPtr>(Conn->getContext()));
+
+    TimingCell::TimeCellPtr cell(weakCell.lock());
+    if (cell) {
+        muduo::ThreadLocalSingleton<TimingWheel>::instance().bindTimeCell(cell);
+    }
 }
 
 void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr &conn) {
     Conn = conn;
-    Conn->setContext("device-center");
+
+    //加入时间轮
+    TimingCell::TimeCellPtr cell(new TimingCell(Conn));
+    cell->setMQTTProxyType(DEVICE_CENTER);
+    muduo::ThreadLocalSingleton<TimingWheel>::instance().bindTimeCell(cell);
+    TimingCell::WeakTimeCellPtr weakTimeCell(cell);
+    Conn->setContext(weakTimeCell);
 
     //连接成功后发送握手协议
     MQTTProxy::MQTTProxyProtocol protocol;

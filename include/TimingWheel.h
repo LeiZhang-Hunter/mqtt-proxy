@@ -12,7 +12,7 @@ namespace MQTTProxy {
 
     public:
 
-        typedef std::unordered_set<TimeCellPtr> Bucket;
+        typedef std::unordered_set<TimingCell::TimeCellPtr> Bucket;
         typedef boost::circular_buffer<Bucket> WeakConnectionList;
 
         void onTimer() {
@@ -23,12 +23,8 @@ namespace MQTTProxy {
             timingWheelConnectionBucket.resize(size);
         }
 
-        void bindTimeCell(const muduo::net::TcpConnectionPtr &conn) {
-//            TimeCellPtr cell(new TimingCell(conn.lock()));
-//            timingWheelConnectionBucket.back().insert(cell);
-//            //绑定一个mqtt处理器
-//            WeakTimeCellPtr weakTimeCell(cell);
-//            conn.setContext(weakTimeCell);
+        void bindTimeCell(const TimingCell::TimeCellPtr& cell) {
+            timingWheelConnectionBucket.back().insert(cell);
         }
 
     private:
