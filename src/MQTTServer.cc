@@ -10,6 +10,8 @@
 #include "MQTTType.h"
 #include "MQTTSessionHandle.h"
 #include "TimingWheel.h"
+#include "MQTTProxyClient.h"
+#include "MQTTProxyHandle.h"
 
 using namespace std::placeholders;
 
