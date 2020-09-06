@@ -137,14 +137,26 @@ void MQTTProxy::MQTTServer::onServerStart(muduo::net::EventLoop *loop) {
 
     //初始化时间轮
     std::string interval;
+    std::string wheeling_interval;
     interval = MQTTContainer.Config.getConfig("interval");
     int interval_time = atoi(interval.c_str());
     if (interval.empty()) {
         std::cerr << "interval must not be empty" << std::endl;
         exit(-1);
     }
+
+    wheeling_interval = MQTTContainer.Config.getConfig("wheeling_interval");
+    if (wheeling_interval.empty()) {
+        std::cerr << "wheeling_interval must not be empty" << std::endl;
+        exit(-1);
+    }
+
+    int wheeling_interval_time = atoi(wheeling_interval.c_str());
+
+    int wheeling_size = (int)(interval_time / wheeling_interval_time);
+
     muduo::ThreadLocalSingleton<TimingWheel>::instance().resizeWheelingSize(interval_time);
-    loop->runEvery(1.0, std::bind(&TimingWheel::onTimer, muduo::ThreadLocalSingleton<TimingWheel>::pointer()));
+    loop->runEvery((double)wheeling_interval_time, std::bind(&TimingWheel::onTimer, muduo::ThreadLocalSingleton<TimingWheel>::pointer()));
 }
 
 void MQTTProxy::MQTTServer::start() {
