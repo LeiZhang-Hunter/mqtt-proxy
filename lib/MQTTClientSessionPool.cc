@@ -41,7 +41,8 @@ MQTTProxy::MQTTClientSessionPool::bindSession(const std::string &client_id,
     //找到了这个客户端id
     if (session != ClientIdMap.end()) {
         //强制关闭
-        if (ClientIdMap[client_id]->getConn()) {
+        std::weak_ptr<muduo::net::TcpConnection> weakConn(ClientIdMap[client_id]->getConn());
+        if (!weakConn.expired()) {
             ClientIdMap[client_id]->getConn()->forceClose();
         }
     } else {

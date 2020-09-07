@@ -54,6 +54,7 @@ void MQTTProxy::MQTTClientSession::SessionOnMessage(const muduo::net::TcpConnect
 //关闭连接的时候触发
 void MQTTProxy::MQTTClientSession::SessionOnClose(const muduo::net::TcpConnectionPtr &conn) {
     Conn = nullptr;
+    IsOnline = Offline;
 }
 
 /*=======================为了将协议处理结果传入到业务层，再次封装了一个托底的回调==============================*/
