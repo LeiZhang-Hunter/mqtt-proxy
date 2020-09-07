@@ -184,6 +184,10 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer *buffer) {
             case PROXY_CONNECT_MESSAGE:
                 MQTTContainer.finished->countDown();
                 break;
+
+            case PROXY_PINGREQ:
+                //心跳包直接过滤掉
+                break;
         }
     }
 

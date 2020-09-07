@@ -86,6 +86,8 @@ namespace MQTTProxy {
         //代理消息类型，这个消息在设备代理接入设备中心成功后会发往设备中心
         PROXY_CONNECT,
         PROXY_CONNECT_MESSAGE,
+        PROXY_PINGREQ,
+        PROXY_PINGRESP,
     };
 
 //协议的类型

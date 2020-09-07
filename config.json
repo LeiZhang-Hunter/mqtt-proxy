@@ -5,5 +5,6 @@
   "notify_ip": "127.0.0.1",
   "notify_port": 9800,
   "interval": 5,
-  "wheeling_interval": 1
+  "wheeling_interval": 1,
+  "proxy_heart_time": 10
 }

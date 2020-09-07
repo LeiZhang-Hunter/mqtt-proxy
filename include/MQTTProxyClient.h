@@ -10,7 +10,7 @@
 using namespace std::placeholders;
 namespace MQTTProxy {
 
-    class MQTTProxyClient : public muduo::noncopyable {
+    class MQTTProxyClient : public muduo::noncopyable, std::enable_shared_from_this<MQTTProxyClient> {
     public:
         MQTTProxyClient() {
 
@@ -36,16 +36,9 @@ namespace MQTTProxy {
             Client->connect();
         }
 
-        bool start() {
-            Client = std::make_shared<muduo::net::TcpClient>(Loop, ConnectAddr, "MQTTProxy");
-            Client->setConnectionCallback(
-                    std::bind(&MQTTProxyClient::onConnection, this, _1));
-            Client->setMessageCallback(
-                    std::bind(&MQTTProxyClient::onMessage, this, _1, _2, _3));
-            Client->enableRetry();
-            connect();
-            return true;
-        }
+        bool start();
+
+        void heart();
 
         bool sendProxyData(const MQTTProxy::MQTTProxyProtocol &protocol);
 

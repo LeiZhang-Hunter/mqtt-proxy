@@ -43,9 +43,6 @@ void MQTTProxy::MQTTProxyClient::onConnection(const muduo::net::TcpConnectionPtr
 
 void MQTTProxy::MQTTProxyClient::onClose(const muduo::net::TcpConnectionPtr &conn) {
 
-    if (!conn->connected()) {
-
-    }
 }
 
 bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtocol &protocol) {
@@ -80,4 +77,49 @@ bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtoco
     } else {
         return false;
     }
+}
+
+void MQTTProxy::MQTTProxyClient::heart() {
+    if (Conn) {
+        std::weak_ptr<muduo::net::TcpConnection> weak(Conn);
+        if (!weak.expired()) {
+            muduo::net::TcpConnectionPtr tcpConn = weak.lock();
+            if (tcpConn->connected()) {
+                //发送心跳包
+                MQTTProxy::MQTTProxyProtocol protocol;
+                protocol.ProtocolType = MQTT_PROXY;
+                protocol.MessageType = PROXY_PINGREQ;
+                protocol.MessageNo = RETURN_OK;
+                protocol.ClientIdLength = 0;
+                protocol.MessageLength = 0;
+                sendProxyData(protocol);
+            }
+        }
+    }
+}
+
+bool MQTTProxy::MQTTProxyClient::start() {
+    Client = std::make_shared<muduo::net::TcpClient>(Loop, ConnectAddr, "MQTTProxyClient");
+    Client->setConnectionCallback(
+            std::bind(&MQTTProxyClient::onConnection, this, _1));
+    Client->setMessageCallback(
+            std::bind(&MQTTProxyClient::onMessage, this, _1, _2, _3));
+    Client->enableRetry();
+
+    //获取配置名字
+    std::string proxy_heart_time_config = MQTTContainer.Config.getConfig("proxy_heart_time");
+    if (proxy_heart_time_config.empty()) {
+        std::cerr << "Heartbeat packet configuration cannot be empty" << std::endl;
+        exit(-1);
+    }
+
+    double proxy_heart_time = atof(proxy_heart_time_config.c_str());
+    if (proxy_heart_time <= 0) {
+        std::cerr << "The heartbeat packet configuration cannot be less than 0" << std::endl;
+        exit(-1);
+    }
+
+    Loop->runAfter(proxy_heart_time, std::bind(&MQTTProxyClient::heart, shared_from_this()));
+    connect();
+    return true;
 }
