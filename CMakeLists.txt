@@ -17,14 +17,13 @@ INCLUDE_DIRECTORIES(
         ${MUDUO_DIR}
 )
 
+
 file(GLOB_RECURSE VENDOR_LIB ${PROJECT_SOURCE_DIR}/vendor/proto/json/src/lib_json/*.cpp)
 
 #生成vendor库
-add_library(vendor SHARED ${VENDOR_LIB})
+add_library(vendor STATIC ${VENDOR_LIB})
 
-file(GLOB_RECURSE LIB_SRC ${PROJECT_SOURCE_DIR}/lib/*.cc)
-
-add_library(device-server-lib STATIC ${LIB_SRC} lib/MQTTProxyConfig.cc)
+aux_source_directory(${PROJECT_SOURCE_DIR}/lib LIB_DIR)
 
 set(SOURCE_SRC
     main.cc
@@ -35,7 +34,7 @@ set(SOURCE_SRC
     src/MQTTConnPool.cc
     include/MQTTProxyConfig.h)
 
-add_executable(mqtt-proxy ${SOURCE_SRC})
+add_executable(mqtt-proxy ${SOURCE_SRC} ${LIB_DIR} )
 
 #定义连接文件
-target_link_libraries(mqtt-proxy  muduo_net muduo_base pthread device-server-lib vendor)
+target_link_libraries(mqtt-proxy  muduo_net muduo_base pthread vendor)
