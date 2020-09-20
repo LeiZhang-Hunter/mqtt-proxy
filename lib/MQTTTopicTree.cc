@@ -279,6 +279,7 @@ void MQTTProxy::MQTTTopicTree::publish(const MQTTProxy::MQTTSubscribe &topic, co
     tree_iterator = SubscribeTree.find(subscribe_key);
     //没有发现节点
     if (tree_iterator == SubscribeTree.end()) {
+        LOG_ERROR << "No push node found";
         return;
     }
 

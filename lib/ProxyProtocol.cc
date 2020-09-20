@@ -102,13 +102,12 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer *buffer) {
         uint16_t crc = MQTTContainer.Util.checkCRC16(crc_string.data(), crc_string.size());
         buffer->retrieve(UINT16_LEN);
         if (crc != crc_check) {
+            LOG_ERROR << "crc parsing error;";
             return false;
         }
 
+
         std::shared_ptr<MQTTProxy::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
-        if (!session && mqtt_type != PROXY_CONNECT_MESSAGE) {
-            continue;
-        }
 
         switch (mqtt_type) {
             case CONNECT_MESSAGE:
