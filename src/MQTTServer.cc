@@ -155,7 +155,7 @@ void MQTTProxy::MQTTServer::onServerStart(muduo::net::EventLoop *loop) {
 
     int wheeling_size = (int)(interval_time / wheeling_interval_time);
 
-    muduo::ThreadLocalSingleton<TimingWheel>::instance().resizeWheelingSize(interval_time);
+    muduo::ThreadLocalSingleton<TimingWheel>::instance().resizeWheelingSize(wheeling_size);
     loop->runEvery((double)wheeling_interval_time, std::bind(&TimingWheel::onTimer, muduo::ThreadLocalSingleton<TimingWheel>::pointer()));
 }
 

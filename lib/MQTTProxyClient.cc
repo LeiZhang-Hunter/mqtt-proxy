@@ -119,7 +119,7 @@ bool MQTTProxy::MQTTProxyClient::start() {
         exit(-1);
     }
 
-    Loop->runAfter(proxy_heart_time, std::bind(&MQTTProxyClient::heart, shared_from_this()));
+    Loop->runEvery(proxy_heart_time, std::bind(&MQTTProxyClient::heart, this));
     connect();
     return true;
 }
