@@ -57,8 +57,12 @@ bool MQTTProxy::MQTTProxyClient::sendProxyData(const MQTTProxy::MQTTProxyProtoco
     //消息的错误码
     buffer.push_back(protocol.MessageNo);
     //客户端id的长度
-    std::vector<__uint8_t> encodeRemainingLength = MQTTContainer.Util.encodeRemainingLength(protocol.ClientIdLength);
-    buffer.insert(buffer.end(), encodeRemainingLength.begin(), encodeRemainingLength.end());
+    std::string clientIdLengthTmp;
+    uint32_t clientIdLength = htonl(protocol.ClientId.length());
+    for (uint8_t l = 0; l < 4; l++) {
+        buffer.push_back(*((uint8_t *) &clientIdLength + l));
+    }
+
     //客户端id的内容
     buffer.insert(buffer.end(), protocol.ClientId.begin(), protocol.ClientId.end());
     //载荷的长度

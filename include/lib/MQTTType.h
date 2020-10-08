@@ -60,4 +60,5 @@ enum{
 
 #define UINT8_LEN 1
 #define UINT16_LEN 2
+#define UINT32_LEN 4
 #endif //DEVICE_SERVER_MQTTTYPE_H

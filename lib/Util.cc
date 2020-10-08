@@ -108,28 +108,34 @@ Json::String MQTTProxyLib::Util::jsonEncode(Json::Value proto_value) {
     return json_string;
 }
 
-uint32_t MQTTProxyLib::Util::decodeRemainingLength(const char *byte) {
+std::pair<uint32_t ,uint32_t> MQTTProxyLib::Util::decodeRemainingLength(const char *byte) {
     int i = 0;
     uint32_t remaining_length = 0;
     //解析剩余的长度
     uint32_t multiplier = UINT8_LEN;
 
-    char data = *byte;
+    uint8_t data = *byte;
+    std::pair<uint32_t ,uint32_t> result;
 
     if (!data) {
-        return 0;
+        result = std::make_pair(0, 0);
+        return result;
     }
 
     do {
         i++;
+        data = *byte;
+
         if (i > 4) {
-            return 0;
+            result = std::make_pair(0, 0);
+            return result;
         }
         remaining_length += (data & 127) * multiplier;
         multiplier *= 128;
         byte++;
-        data = *byte++;
     } while ((data & 128) != 0);
 
-    return remaining_length;
+    result = std::make_pair(remaining_length, i);
+
+    return result;
 }

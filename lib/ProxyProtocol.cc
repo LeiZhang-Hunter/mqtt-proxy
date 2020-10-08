@@ -25,6 +25,9 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer *buffer) {
     const char *start;
     std::vector<uint8_t> crc_string;
     uint8_t qos_level;
+    std::string client_id;
+    std::string payload;
+    uint32_t payload_len;
 
     while (left_len > 0) {
         std::shared_ptr<MQTTProxy::MQTTProxyProtocol> protocol = std::make_shared<MQTTProxy::MQTTProxyProtocol>();
@@ -54,45 +57,75 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer *buffer) {
         protocol->MessageNo = message_no;
 
         //解码出长度
-        const char *client_id_len_byte = buffer->peek();
-        uint32_t client_id_len = MQTTContainer.Util.decodeRemainingLength(client_id_len_byte);
-        crc_string.push_back(*client_id_len_byte);
-        buffer->retrieve(UINT8_LEN);
-        left_len -= UINT8_LEN;
-        read_len += UINT8_LEN;
-        protocol->ClientIdLength = client_id_len;
-
-
-        //解析出client_id
-        std::string client_id;
+        uint32_t client_id_len = buffer->peekInt32();
         if (client_id_len) {
+            protocol->ClientIdLength = client_id_len;
+
+            //解析出client_id
             if (client_id_len > left_len) {
                 return false;
             }
+
+            uint32_t netClientLength = htonl(client_id_len);
+
+            for (uint8_t l = 0; l < 4; l++) {
+                crc_string.push_back(*((uint8_t *) &netClientLength + l));
+                buffer->retrieve(UINT8_LEN);
+                left_len -= UINT8_LEN;
+                read_len += UINT8_LEN;
+            }
+
             client_id.assign(buffer->peek(), client_id_len);
+            crc_string.insert(crc_string.end(), client_id.begin(), client_id.end());
+            protocol->ClientId = client_id;
             buffer->retrieve(client_id_len);
             left_len -= client_id_len;
             read_len += client_id_len;
-            crc_string.insert(crc_string.end(), client_id.begin(), client_id.end());
-            protocol->ClientId = client_id;
+            std::cout << protocol->ClientId << std::endl;
+            std::cout << protocol->ClientId.length() << std::endl;
+        } else {
+            buffer->retrieve(UINT32_LEN);
+            //大端必须填充4个0
+            crc_string.push_back(0);
+            crc_string.push_back(0);
+            crc_string.push_back(0);
+            crc_string.push_back(0);
+            left_len -= UINT32_LEN;
+            read_len += UINT32_LEN;
         }
+
 
         //尝试解析载荷长度
         const char *payload_len_byte = buffer->peek();
-        uint32_t payload_len = MQTTContainer.Util.decodeRemainingLength(payload_len_byte);
-        crc_string.push_back(*payload_len_byte);
-        buffer->retrieve(UINT8_LEN);
-        left_len -= UINT8_LEN;
-        std::string payload;
-        if (payload_len) {
+        std::pair<uint32_t, uint32_t> payload_len_result = MQTTContainer.Util.decodeRemainingLength(payload_len_byte);
+        if (payload_len_result.first) {
+            payload_len = payload_len_result.first;
+
+            //将载荷长度放入到crc校验中去
+            for(int i = 0; i < payload_len_result.second; i++)
+            {
+                crc_string.push_back(payload_len_byte[i]);
+            }
+            buffer->retrieve(payload_len_result.second);
+            left_len -= payload_len_result.second;
+            read_len += payload_len_result.second;
             if (payload_len > left_len) {
                 return false;
             }
+
             payload.assign(buffer->peek(), payload_len);
+            std::cout << payload << std::endl;
             protocol->Payload.insert(protocol->Payload.end(), payload.begin(), payload.end());
             buffer->retrieve(payload_len);
             left_len -= payload_len;
             crc_string.insert(crc_string.end(), payload.begin(), payload.end());
+
+
+        } else {
+            buffer->retrieve(UINT8_LEN);
+            crc_string.push_back(0);
+            left_len -= UINT8_LEN;
+            read_len += UINT8_LEN;
         }
 
         //CRC校验包的正确性
@@ -106,6 +139,10 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer *buffer) {
             return false;
         }
 
+        if (mqtt_type == PROXY_PINGREQ) {
+            //心跳包直接过滤掉
+            return true;
+        }
 
         std::shared_ptr<MQTTProxy::MQTTClientSession> session = MQTTContainer.SessionPool->findSession(client_id);
 
@@ -182,10 +219,6 @@ bool MQTTProxy::ProxyProtocolHandle::parse(muduo::net::Buffer *buffer) {
 
             case PROXY_CONNECT_MESSAGE:
                 MQTTContainer.finished->countDown();
-                break;
-
-            case PROXY_PINGREQ:
-                //心跳包直接过滤掉
                 break;
         }
     }

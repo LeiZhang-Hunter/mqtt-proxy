@@ -72,22 +72,22 @@ namespace MQTTProxy {
 //协议的类型
     enum {
         //MQTT协议的消息类型
-        CONNECT,
-        CONNECT_MESSAGE,
-        SUBSCRIBE,
-        SUBSCRIBE_MESSAGE,
-        UNSUBSCRIBE,
-        UNSUBSCRIBE_MESSAGE,
-        PUBLISH,
-        PUBLISH_MESSAGE,
-        DISCONNECT,
-        DISCONNECT_MESSAGE,
+        CONNECT = 0,
+        CONNECT_MESSAGE = 1,
+        SUBSCRIBE = 2,
+        SUBSCRIBE_MESSAGE = 3,
+        UNSUBSCRIBE = 4,
+        UNSUBSCRIBE_MESSAGE = 5,
+        PUBLISH = 6,
+        PUBLISH_MESSAGE = 7,
+        DISCONNECT = 8,
+        DISCONNECT_MESSAGE = 9,
 
         //代理消息类型，这个消息在设备代理接入设备中心成功后会发往设备中心
-        PROXY_CONNECT,
-        PROXY_CONNECT_MESSAGE,
-        PROXY_PINGREQ,
-        PROXY_PINGRESP,
+        PROXY_CONNECT = 10,
+        PROXY_CONNECT_MESSAGE = 11,
+        PROXY_PINGREQ = 12,
+        PROXY_PINGRESP = 13,
     };
 
 //协议的类型

@@ -15,7 +15,7 @@ bool MQTTProxy::MQTTProxyConfig::loadConfig() {
 
     int fileFd = open(ConfigPath.c_str(), O_RDWR);
 
-    if (!fileFd) {
+    if (fileFd == -1) {
         std::cerr << "open log failed:" << __FILE__ << ";line:" << __LINE__ << std::endl;
         exit(-1);
     }

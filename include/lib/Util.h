@@ -15,7 +15,7 @@ public:
     //字节编码
     std::vector<uint8_t> encodeRemainingLength(uint32_t remainingLength);
 
-    uint32_t decodeRemainingLength(const char* byte);
+    std::pair<uint32_t ,uint32_t> decodeRemainingLength(const char* byte);
 
     //CRC16的校验
     uint16_t checkCRC16(uint8_t * pMsg ,uint16_t u16_DataLen);
