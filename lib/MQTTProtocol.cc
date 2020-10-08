@@ -113,11 +113,11 @@ bool MQTTProxyLib::MQTTProtocol::parse(muduo::net::Buffer *buf, const muduo::net
                         subscribe.QosLevel = qos_level;
                         OnPublish(subscribe, payload);
                     }
-//                    if (qos_level == QUALITY_LEVEL_ONE) {
-//                        response.sendPublishAck(conn, message_id);
-//                    } else if (qos_level == QUALITY_LEVEL_TWO) {
-//                        response.sendPublishRec(conn, message_id);
-//                    }
+                    if (qos_level == QUALITY_LEVEL_ONE) {
+                        response.sendPublishAck(conn, message_id);
+                    } else if (qos_level == QUALITY_LEVEL_TWO) {
+                        response.sendPublishRec(conn, message_id);
+                    }
                 } else {
                     LOG_ERROR << "parseOnPublish return false";
                     bufferRollback(buf);

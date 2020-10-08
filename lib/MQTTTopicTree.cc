@@ -250,6 +250,8 @@ void MQTTProxy::MQTTTopicTree::publishHook(SessionMapType sessionList, const MQT
                 }
             }
         }
+    } else {
+        LOG_ERROR << "publishHook session list size zero";
     }
 }
 
