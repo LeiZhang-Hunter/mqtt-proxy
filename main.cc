@@ -9,6 +9,7 @@ MQTTContainerGlobal MQTTContainer;
 
 
 int main(int argc, char **argv) {
+
     //解析命令行的配置选项 为了解析出配置文件的路径
     int opt;
     while ((opt = getopt(argc, argv, "c")) != -1) {
